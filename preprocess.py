@@ -41,7 +41,7 @@ def loadDataSetFromFile():
 				# add the expressions to their respective cells
 				k = 0 # used to iterate across cells
 				for expression in geneExpressions:
-					data[k].append(expression)
+					data[k].append(float(expression)) # cast string to float and append to cell's array
 					k += 1
 
 				geneIdx += 1 # move to next gene i.e. row
