@@ -1,22 +1,24 @@
 import sys
 import numpy as np
+from RNASeqData import RNASeqData
 import preprocess
-import SCC_Rna_seq_NaiveBayes
+# import SCC_Rna_seq_NaiveBayes
 
 
 if __name__ == '__main__':
 	print "start"
 
-	data = preprocess.run()
+	# initialize the data set class
+	data = RNASeqData()
+	
+	
+	data.setData(preprocess.run(data.rawDataFileName))
 
-	print "data set processed"
+	db = data.getData()
 
-	# for x in np.nditer(data):
-	# 	print x
+	print db[5][5]
 
-	# print len(data[0]) --> should be 19972 i.e. 19972 genes
+# Resource: http://machinelearningmastery.com/get-your-hands-dirty-with-scikit-learn-now/
+# Python for Java Programmers: http://python4java.necaiseweb.org/Fundamentals/TheBasics
 
-	# for d in data[0]:
-	# 	print d
 
-	# SCC_Rna_seq_NaiveBayes.run()
