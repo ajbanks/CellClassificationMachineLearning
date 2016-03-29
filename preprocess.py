@@ -10,7 +10,7 @@ def loadDataSetFromFile():
 	print "reading data into memory"
 
 	# relative path to file
-	fileName = "../Data/GSE60361C13005Expression.txt"
+	fileName = "GSE60361_C1-3005-Expression.txt"
 
 	# initialize list
 	data = []

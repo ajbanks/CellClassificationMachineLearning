@@ -9,8 +9,10 @@ if __name__ == '__main__':
 
 	data = preprocess.run()
 
-	for x in np.nditer(data):
-		print x
+	print "data set processed"
+
+	# for x in np.nditer(data):
+	# 	print x
 
 	# print len(data[0]) --> should be 19972 i.e. 19972 genes
 
