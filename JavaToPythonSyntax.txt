@@ -1,0 +1,34 @@
+Quick Guide for Python Programming from a Java Perspective
+
+Source: http://python4java.necaiseweb.org/Fundamentals/TheBasics
+
+
+Basics:
+
+- Python Reserve Words and Identifiers:
+and     assert    break     class     continue
+def     del       elif      else      except
+exec    finally   for       from      global
+if      import    in        is        lambda
+not     or        pass      print     raise
+return  try       while 
+
+float
+int
+string
+
+- If a statment is too long to fit on a single line, however, you can use a backslash (\) at the end of the line and continue the statement onto the next line.
+
+	result = (someValue * 5 + anotherValue * 12) \
+         - (originalValue * 2)
+
+- Primitive Types:
+    Numeric: integer, long integer, floating-point, complex (real and imaginary parts)
+    Boolean: True, False
+    Strings: "xxxxx"
+    Sequences: 
+    	list (array) --> [0,1,2,3]
+    	tuple (final list) --> 1,2,3 OR (1,2,3)
+    Collections:
+    	dictionary (hash) --> {123 : "hey", 456 : "sup"}
+    	set (unordered collection of immutable values)
