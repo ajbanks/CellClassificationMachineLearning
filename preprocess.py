@@ -269,27 +269,22 @@ def downSampleByClusterSize(rawData, cellIdentifierAnnotations):
 
 	# use the random indices to remove cells whose index is not in any random list 1-9 from the raw data set
 	# BUG - SHOULD ONLY BE 234 CELLS LEFT AFTER BUT CURRENTLY 1540
-	idx = -1
+	downSampleClusterData = []
+	idx = 0
 	for cell in rawData:
-		idx += 1
-		if idx not in randIndices: # if the current cell was not randomly selected, remove
-			rawData.pop(idx)
+		if idx in randIndices: # if the current cell was not randomly selected, remove
+			downSampleClusterData.append(cell)
+		idx += 1 # move to next cell
 
-	print len(rawData)
+	print "{numCells} total cells randomly selected, genes = {numGenes}".format(numCells=len(downSampleClusterData), 
+		numGenes=len(downSampleClusterData[0]))
 
+	return downSampleClusterData, randIndices
 
-# normalize data
-def preprocessData(data):
-	print "preprocessing data"
+def normalizeData(data):
+	print "normalizing data"
 
 	# create a numpy array from the list
 	dataNP = np.array(data)
 
 	data_normalized = preprocessing.scale(dataNP)
-
-	partitionData(data)
-
-# Preprocessing notes:
-# 	- Test set has same format as training set
-#	- Ideal is 70/30 partition
-#	- Must partition randomly ***

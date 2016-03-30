@@ -16,13 +16,21 @@ if __name__ == '__main__':
 
 	# read cell identifier annotations into memory
 	data.setCellIdentifierAnnotations(preprocess.loadCellIdentifierAnnotations(data.annotationsFileName, 
-		data.getNumCells()))
+		data.getNumCellsRaw()))
 
 	# read molecule count annotations into memory
 	data.setMoleculeCountAnnotations(preprocess.loadMoleculeCountAnnotations(data.annotationsFileName,
-		data.getNumCells()))
+		data.getNumCellsRaw()))
 
-	preprocess.downSampleByClusterSize(data.getRawData(), data.getCellIdentifierAnnotations())
+	# down sample the data by cluster size --> MAKE THIS A CLA OPTION
+	#	 i.e. scale all cluster size to the smallest cluster (by number of cells)
+	# save down sampled data and random indices for accessing corresponding annotations
+	downSampleClusterData, randIndices = preprocess.downSampleByClusterSize(data.getRawData(), 
+		data.getCellIdentifierAnnotations())
+
+	# add the data and random indices reference to the data class
+	data.setDSClusterData(downSampleClusterData)
+	data.setRandIndicesFromDS(randIndices)
 
 # Resource: http://machinelearningmastery.com/get-your-hands-dirty-with-scikit-learn-now/
 # Python for Java Programmers: http://python4java.necaiseweb.org/Fundamentals/TheBasics
