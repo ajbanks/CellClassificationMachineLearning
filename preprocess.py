@@ -2,13 +2,10 @@ import sys
 import xlrd
 from sklearn import preprocessing
 import numpy as np
-from sklearn.cross_validation import train_test_split
+import random
 
-def run(fileName):
-	return loadDataSetFromFile(fileName)
-
-def loadDataSetFromFile(fileName):
-	print "reading data into memory"
+def loadRawData(fileName):
+	print "\nreading data into memory"
 
 	# the 9 cell type classifying genes
 	Thy1 = "Thy1"
@@ -99,10 +96,187 @@ def loadDataSetFromFile(fileName):
 	print "Added {numGenes} gene reads to {numCells} cells".format(numGenes=genesUsed, numCells=cellIdx)
 	print "Reduced data dimensionality by removing {numGenesRemoved} genes with <= 25 total reads".format(numGenesRemoved=genesRemoved)
 
-	print "rows = {rows}".format(rows=len(data))
-	print "cols = {cols}".format(cols=len(data[0]))
+	print "rows (cells) = {rows}".format(rows=len(data))
+	print "cols (genes) = {cols}".format(cols=len(data[0]))
 
 	return data
+
+def loadCellIdentifierAnnotations(fileName, numCells):
+	print "\nloading cell identifier annotations"
+	with open(fileName) as ins:
+		# ignore first line of ____ ?
+		line_1 = ins.readline()
+
+		line_2 = ins.readline()
+		
+		# split the line into individual cell identifiers
+		identifiers = line_2.split("	")
+
+		# remove whitespace and title
+		identifiers.pop(0)
+		identifiers.pop(0)
+
+		if len(identifiers) == numCells:
+			# remove newline identifier from final entry
+			identifiers[len(identifiers)-1] = identifiers[len(identifiers)-1][:-len("\n")]
+
+			return identifiers
+
+		else: #debug statement
+			print "Error loading annotations: num identifiers = {numIdentifiers}, num cells = {numCells}".format(numIdentifiers=len(identifiers), numCells=numCells)
+
+def loadMoleculeCountAnnotations(fileName, numCells):
+	print "\nloading molecule count annotations"
+	with open(fileName) as ins:
+		# ignore first lines of ___ and group numbers
+		line_1 = ins.readline()
+		line_2 = ins.readline()
+
+		line_3 = ins.readline()
+
+		moleculeCounts = line_3.split("	")
+
+		# remove whitespace and title
+		moleculeCounts.pop(0)
+		moleculeCounts.pop(0)
+		
+		if len(moleculeCounts) == numCells:
+			# remove newline identifier from final entry
+			moleculeCounts[len(moleculeCounts)-1] = moleculeCounts[len(moleculeCounts)-1][:-len("\n")]
+
+			return moleculeCounts
+		else: # debug statement
+			print "Error loading annotations: num molecule counts = {numMoleculeCounts}, num cells = {numCells}".format(numMoleculeCounts=len(moleculeCounts), numCells=numCells)
+
+def downSampleByClusterSize(rawData, cellIdentifierAnnotations):
+	print "\ndown sampling by cluster size"
+
+	# initialize counters for the 9 types
+	type1 = 0
+	type2 = 0
+	type3 = 0
+	type4 = 0
+	type5 = 0
+	type6 = 0
+	type7 = 0
+	type8 = 0
+	type9 = 0
+
+	# initialize lists to hold indices of cells of a group
+	type1Indices = []
+	type2Indices = []
+	type3Indices = []
+	type4Indices = []
+	type5Indices = []
+	type6Indices = []
+	type7Indices = []
+	type8Indices = []
+	type9Indices = []
+
+	idx = 0
+	for t in cellIdentifierAnnotations:
+		_type = int(t)
+
+		if _type == 1:
+			type1Indices.append(idx)
+			type1 += 1
+		elif _type == 2:
+			type2Indices.append(idx)
+			type2 += 1
+		elif _type == 3:
+			type3Indices.append(idx)
+			type3 += 1
+		elif _type == 4:
+			type4Indices.append(idx)
+			type4 += 1
+		elif _type == 5:
+			type5Indices.append(idx)
+			type5 += 1
+		elif _type == 6:
+			type6Indices.append(idx)
+			type6 += 1
+		elif _type == 7:
+			type7Indices.append(idx)
+			type7 += 1
+		elif _type == 8:
+			type8Indices.append(idx)
+			type8 += 1
+		elif _type == 9:
+			type9Indices.append(idx)
+			type9 += 1
+
+		# increment the idx
+		idx += 1
+
+
+	print "type1 count = {type1Count}".format(type1Count=type1)
+	print "type2 count = {type2Count}".format(type2Count=type2)
+	print "type3 count = {type3Count}".format(type3Count=type3)
+	print "type4 count = {type4Count}".format(type4Count=type4)
+	print "type5 count = {type5Count}".format(type5Count=type5)
+	print "type6 count = {type6Count}".format(type6Count=type6)
+	print "type7 count = {type7Count}".format(type7Count=type7)
+	print "type8 count = {type8Count}".format(type8Count=type8)
+	print "type9 count = {type9Count}".format(type9Count=type9)
+
+	# add all type counts to list to find smallest value
+	typeCounts = [type1, type2, type3, type4, type5, type6, type7, type8, type9]
+
+	minVal = min(typeCounts)
+
+	print "minumum cluster cell count = {minClusterCount}".format(minClusterCount=minVal)
+
+	# take minVal number of random cells from each cluster
+	randType1Indices = random.sample(type1Indices, minVal)
+	randType2Indices = random.sample(type2Indices, minVal)
+	randType3Indices = random.sample(type3Indices, minVal)
+	randType4Indices = random.sample(type4Indices, minVal)
+	randType5Indices = random.sample(type5Indices, minVal)
+	randType6Indices = random.sample(type6Indices, minVal)
+	randType7Indices = random.sample(type7Indices, minVal)
+	randType8Indices = random.sample(type8Indices, minVal)
+	randType9Indices = random.sample(type9Indices, minVal)
+
+	# make list of all randomly selected indices
+	randIndices = []
+
+	for randIdx in randType1Indices:
+		randIndices.append(randIdx)
+
+	for randIdx in randType2Indices:
+		randIndices.append(randIdx)
+
+	for randIdx in randType3Indices:
+		randIndices.append(randIdx)
+
+	for randIdx in randType4Indices:
+		randIndices.append(randIdx)
+
+	for randIdx in randType5Indices:
+		randIndices.append(randIdx)
+
+	for randIdx in randType6Indices:
+		randIndices.append(randIdx)
+
+	for randIdx in randType7Indices:
+		randIndices.append(randIdx)
+
+	for randIdx in randType8Indices:
+		randIndices.append(randIdx)
+
+	for randIdx in randType9Indices:
+		randIndices.append(randIdx)
+
+	# use the random indices to remove cells whose index is not in any random list 1-9 from the raw data set
+	# BUG - SHOULD ONLY BE 234 CELLS LEFT AFTER BUT CURRENTLY 1540
+	idx = -1
+	for cell in rawData:
+		idx += 1
+		if idx not in randIndices: # if the current cell was not randomly selected, remove
+			rawData.pop(idx)
+
+	print len(rawData)
+
 
 # normalize data
 def preprocessData(data):

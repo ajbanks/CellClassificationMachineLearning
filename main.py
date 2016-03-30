@@ -11,12 +11,18 @@ if __name__ == '__main__':
 	# initialize the data set class
 	data = RNASeqData()
 	
-	
-	data.setData(preprocess.run(data.rawDataFileName))
+	# read raw RNA seq data into memory
+	data.setRawData(preprocess.loadRawData(data.rawDataFileName))
 
-	db = data.getData()
+	# read cell identifier annotations into memory
+	data.setCellIdentifierAnnotations(preprocess.loadCellIdentifierAnnotations(data.annotationsFileName, 
+		data.getNumCells()))
 
-	print db[5][5]
+	# read molecule count annotations into memory
+	data.setMoleculeCountAnnotations(preprocess.loadMoleculeCountAnnotations(data.annotationsFileName,
+		data.getNumCells()))
+
+	preprocess.downSampleByClusterSize(data.getRawData(), data.getCellIdentifierAnnotations())
 
 # Resource: http://machinelearningmastery.com/get-your-hands-dirty-with-scikit-learn-now/
 # Python for Java Programmers: http://python4java.necaiseweb.org/Fundamentals/TheBasics
