@@ -17,6 +17,10 @@ class RNASeqData(object):
 	def setDSClusterData(self, dsClusterData):
 		self.dsClusterData = dsClusterData
 
+	# data that has been down sampled by molecule count
+	def setDSCluster_MoleculeData(self, dsCluster_MoleculeData):
+		self.dsCluster_MoleculeData = dsCluster_MoleculeData
+
 	# annotations that identify the group (1-9) of each cell
 	def setCellIdentifierAnnotations(self, cellIdentifierAnnotations):
 		self.cellIdentifierAnnotations = cellIdentifierAnnotations
@@ -26,7 +30,8 @@ class RNASeqData(object):
 		self.moleculeCountAnnotations = moleculeCountAnnotations
 
 	def setRandIndicesFromDS(self, randIndices):
-		self.randIndices = randIndices
+		# put the indices in ascending order
+		self.randIndices = sorted(randIndices)
 
 	def getRandIndices(self):
 		return self.randIndices
@@ -36,6 +41,9 @@ class RNASeqData(object):
 
 	def getDSClusterData(self):
 		return self.dsClusterData
+
+	def getDSCluster_MoleculeData(self):
+		return self.dsCluster_MoleculeData
 
 	def getCellIdentifierAnnotations(self):
 		return self.cellIdentifierAnnotations

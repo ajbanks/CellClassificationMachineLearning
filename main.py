@@ -5,6 +5,9 @@ import preprocess
 # import SCC_Rna_seq_NaiveBayes
 
 
+# Resource: http://machinelearningmastery.com/get-your-hands-dirty-with-scikit-learn-now/
+# Python for Java Programmers: http://python4java.necaiseweb.org/Fundamentals/TheBasics
+
 if __name__ == '__main__':
 	print "start"
 
@@ -22,7 +25,7 @@ if __name__ == '__main__':
 	data.setMoleculeCountAnnotations(preprocess.loadMoleculeCountAnnotations(data.annotationsFileName,
 		data.getNumCellsRaw()))
 
-	# down sample the data by cluster size --> MAKE THIS A CLA OPTION
+	# down sample the data by cluster size --> MAKE DOWN SAMPLING A CLA OPTION
 	#	 i.e. scale all cluster size to the smallest cluster (by number of cells)
 	# save down sampled data and random indices for accessing corresponding annotations
 	downSampleClusterData, randIndices = preprocess.downSampleByClusterSize(data.getRawData(), 
@@ -32,7 +35,6 @@ if __name__ == '__main__':
 	data.setDSClusterData(downSampleClusterData)
 	data.setRandIndicesFromDS(randIndices)
 
-# Resource: http://machinelearningmastery.com/get-your-hands-dirty-with-scikit-learn-now/
-# Python for Java Programmers: http://python4java.necaiseweb.org/Fundamentals/TheBasics
-
-
+	# down sample the data by the cell with the least number of molecules
+	data.setDSCluster_MoleculeData(preprocess.downSampleByMoleculeCount(data.getDSClusterData(),
+		data.getMoleculeCountAnnotations(), data.getRandIndices()))

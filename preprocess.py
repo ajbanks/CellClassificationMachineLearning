@@ -1,8 +1,10 @@
+from __future__ import division
 import sys
 import xlrd
 from sklearn import preprocessing
 import numpy as np
 import random
+import math
 
 def loadRawData(fileName):
 	print "\nreading data into memory"
@@ -280,6 +282,71 @@ def downSampleByClusterSize(rawData, cellIdentifierAnnotations):
 		numGenes=len(downSampleClusterData[0]))
 
 	return downSampleClusterData, randIndices
+
+def downSampleByMoleculeCount(downSampleClusterData, moleculeCountAnnotations, randIndices):
+	print "\ndown sampling by molecule count"
+
+	# make sure the number of random indices matches the number of cells in the down sample cluster data
+	if len(downSampleClusterData) != len(randIndices):
+		print "error: discrepancy between number of cells in db and indices list"
+		return;
+
+	# make a list of the molecule count annotations corresponding to the randomly selected cells
+	moleculeCountAnnsDS = []
+	idx = 0
+	for moleculeCount in moleculeCountAnnotations:
+		if idx in randIndices:
+			moleculeCountAnnsDS.append(int(moleculeCount))
+		idx += 1
+
+	# make sure that we have parallel annotations for all cells
+	if len(downSampleClusterData) != len(moleculeCountAnnsDS):
+		print "error: discrepancy between number of cells in db and molecule annotations"
+		return;
+
+	# find the smallest value in the list i.e. the cell with the least number of molecules. other values for reference
+	minValue = min(moleculeCountAnnsDS)
+	maxValue = max(moleculeCountAnnsDS)
+	avgValue = sum(moleculeCountAnnsDS)/len(moleculeCountAnnsDS)
+
+	print "down sampling all cells to minimum value = {minValue} molecules (max value = {maxValue}, avg value = {avgValue})".format(minValue=minValue,
+	 maxValue=maxValue, avgValue=avgValue)
+
+	# create data set down sampled by both cluster size and mnolecule count
+	dsCluster_MoleculeData = []
+
+	# iterate over all cells in down sample cluster data
+	idx = 0
+	for cell in downSampleClusterData:
+		# initialize new list for genes down sampled by molecule count
+		genesDS = []
+		
+		# find the proportion of this cell's molecule count to the smallest cell's molecule count
+		prop = minValue/moleculeCountAnnsDS[idx]
+		
+		# iterate over all genes in the cell
+		for gene in cell:
+
+			# scale this gene to the proportion i.e. geneReadCount * proportion
+			_gene = gene * prop
+
+			# randomize a number between 0 and 1 to round up ( > .5) or down ( < .5)
+			rand = random.random()
+
+			if rand > .4999999999999:
+				genesDS.append(math.ceil(_gene))
+			else:
+				genesDS.append(math.floor(_gene))
+
+		# add the cell's scaled gene data to the db
+		dsCluster_MoleculeData.append(genesDS)
+
+		# increment index
+		idx += 1
+
+	# make sure the number of cells and number of genes are correct
+	if len(downSampleClusterData) == len(dsCluster_MoleculeData) and len(downSampleClusterData[0]) == len(dsCluster_MoleculeData[0]):
+	 return dsCluster_MoleculeData
 
 def normalizeData(data):
 	print "normalizing data"
