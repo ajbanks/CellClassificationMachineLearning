@@ -38,3 +38,10 @@ if __name__ == '__main__':
 	# down sample the data by the cell with the least number of molecules
 	data.setDSCluster_MoleculeData(preprocess.downSampleByMoleculeCount(data.getDSClusterData(),
 		data.getMoleculeCountAnnotations(), data.getRandIndices()))
+
+	# feature extraction --> find the avg type of each cluster
+	data.setFeatures(preprocess.featureExtraction(data.getDSCluster_MoleculeData(),
+		data.getCellIdentifierAnnotations(), data.getRandIndices()))
+
+	# partition the data set into 70% training and 30% testing
+	data.makeTrainingAndTestingData()

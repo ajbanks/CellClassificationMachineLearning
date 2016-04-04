@@ -13,6 +13,8 @@ def predictTestData(testing_data):
 
 
 
+# a = np.array(a)
+
 #  Naive Bayes Notes
 # 	- P(outcome | known evidence)
 #	- To predict an outcome given multiple evidence i.e. multiple cell types,
