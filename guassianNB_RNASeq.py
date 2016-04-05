@@ -1,15 +1,33 @@
 import numpy as np
 from sklearn.naive_bayes import GaussianNB
 
+gnb = GaussianNB()
+
 # Source: http://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html#sklearn.naive_bayes.GaussianNB.fit
 def fitTrainingData(training_data, nSamples):
-	gnb = GaussianNB() # can I make this class/file wide?
+	print "\nfitting training data to gaussian naive bayes classifier"
 
-	# fit gaussian naive bayes according to n samples and n features
-	gnb.fit(training_data, nSamples)
+	# fit(X,Y)
+		# x = 2D array of cells
+		# y = 1D list of classifiers i.e. [group1, group1, group2, group2]
+
+	# makes lists into np arrays
+	training_dataNP = np.array(training_data)
+	nSamplesNP = np.array(nSamples)
+
+	# fit gaussian naive bayes according to samples and n features
+	gnb.fit(training_dataNP, nSamplesNP)
 
 def predictTestData(testing_data):
-	# gnb.predit()
+	print "\npredicting test data on gaussian naive bayes classifier"
+	
+	# make list into np array
+	testing_dataNP = np.array(testing_data)
+
+	# predict the values
+	predicted = gnb.predict(testing_dataNP)
+
+	print predicted
 
 
 

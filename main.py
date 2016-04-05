@@ -2,7 +2,7 @@ import sys
 import numpy as np
 from RNASeqData import RNASeqData
 import preprocess
-# import SCC_Rna_seq_NaiveBayes
+import guassianNB_RNASeq
 
 
 # Resource: http://machinelearningmastery.com/get-your-hands-dirty-with-scikit-learn-now/
@@ -39,9 +39,20 @@ if __name__ == '__main__':
 	data.setDSCluster_MoleculeData(preprocess.downSampleByMoleculeCount(data.getDSClusterData(),
 		data.getMoleculeCountAnnotations(), data.getRandIndices()))
 
+	# DON'T NEED THIS ANYMORE
 	# feature extraction --> find the avg type of each cluster
-	data.setFeatures(preprocess.featureExtraction(data.getDSCluster_MoleculeData(),
-		data.getCellIdentifierAnnotations(), data.getRandIndices()))
+	# data.setFeatures(preprocess.featureExtraction(data.getDSCluster_MoleculeData(),
+		# data.getCellIdentifierAnnotations(), data.getRandIndices()))
 
 	# partition the data set into 70% training and 30% testing
 	data.makeTrainingAndTestingData()
+
+	# fit training data to gaussian nb
+	guassianNB_RNASeq.fitTrainingData(data.getTrainingData(), data.getTargetValues())
+
+	# # predict values using gaussian nb
+	guassianNB_RNASeq.predictTestData(data.getTestingData())
+	print data.getTestingDataTargetValues()
+
+
+	print "\nexiting"
