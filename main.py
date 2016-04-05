@@ -3,6 +3,7 @@ import numpy as np
 from RNASeqData import RNASeqData
 import preprocess
 import guassianNB_RNASeq
+import analysis
 
 
 # Resource: http://machinelearningmastery.com/get-your-hands-dirty-with-scikit-learn-now/
@@ -50,9 +51,11 @@ if __name__ == '__main__':
 	# fit training data to gaussian nb
 	guassianNB_RNASeq.fitTrainingData(data.getTrainingData(), data.getTargetValues())
 
-	# # predict values using gaussian nb
-	guassianNB_RNASeq.predictTestData(data.getTestingData())
-	print data.getTestingDataTargetValues()
+	# predict values using gaussian nb
+	guassianNB_predictionResults = guassianNB_RNASeq.predictTestData(data.getTestingData())
+	
+	# analyze results of guassian nb
+	analysis.analyzeResults("Guassian Naive Bayes", guassianNB_predictionResults, data.getTestingDataTargetValues())
 
 
 	print "\nexiting"

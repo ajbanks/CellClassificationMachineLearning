@@ -27,7 +27,7 @@ def predictTestData(testing_data):
 	# predict the values
 	predicted = gnb.predict(testing_dataNP)
 
-	print predicted
+	return predicted
 
 
 
