@@ -89,33 +89,107 @@ def analyzeResults(classifier, predictions, answerKey):
 	type8Results = type8ResultsCount/type8KeyCounts
 	type9Results = type9ResultsCount/type9KeyCounts
 
+	# we need to establish a metric to penalize over classification i.e. classifying 9 cells as type 1 when only 8 cells are type 1
+	# we'll find the proportion of 1 cell/all cells of type and subtract this with each over classified cell
+	type1Proportion = 1/type1KeyCounts
+	type2Proportion = 1/type2KeyCounts
+	type3Proportion = 1/type3KeyCounts
+	type4Proportion = 1/type4KeyCounts
+	type5Proportion = 1/type5KeyCounts
+	type6Proportion = 1/type6KeyCounts
+	type7Proportion = 1/type7KeyCounts
+	type8Proportion = 1/type8KeyCounts
+	type9Proportion = 1/type9KeyCounts
+
+	# check each result for over classification, and substract accordingly. else, set by proportion
+	type1Results = 0
+	if type1ResultsCount > type1KeyCounts:
+		type1Results = 1.0 - (type1Proportion*(type1ResultsCount - type1KeyCounts))
+	else:
+		type1Results = type1ResultsCount/type1KeyCounts
+
+	type1Results = 0
+	if type1ResultsCount > type1KeyCounts:
+		type1Results = 1.0 - (type1Proportion*(type1ResultsCount - type1KeyCounts))
+	else:
+		type1Results = type1ResultsCount/type1KeyCounts
+
+	type2Results = 0
+	if type2ResultsCount > type2KeyCounts:
+		type2Results = 1.0 - (type2Proportion*(type2ResultsCount - type2KeyCounts))
+	else:
+		type2Results = type2ResultsCount/type2KeyCounts
+
+	type3Results = 0
+	if type3ResultsCount > type3KeyCounts:
+		type3Results = 1.0 - (type3Proportion*(type3ResultsCount - type3KeyCounts))
+	else:
+		type3Results = type3ResultsCount/type3KeyCounts
+
+	type4Results = 0
+	if type4ResultsCount > type4KeyCounts:
+		type4Results = 1.0 - (type4Proportion*(type4ResultsCount - type4KeyCounts))
+	else:
+		type4Results = type4ResultsCount/type4KeyCounts
+
+	type5Results = 0
+	if type5ResultsCount > type5KeyCounts:
+		type5Results = 1.0 - (type5Proportion*(type5ResultsCount - type5KeyCounts))
+	else:
+		type5Results = type5ResultsCount/type5KeyCounts
+
+	type6Results = 0
+	if type6ResultsCount > type6KeyCounts:
+		type6Results = 1.0 - (type6Proportion*(type6ResultsCount - type6KeyCounts))
+	else:
+		type6Results = type6ResultsCount/type6KeyCounts
+
+	type7Results = 0
+	if type7ResultsCount > type7KeyCounts:
+		type7Results = 1.0 - (type7Proportion*(type7ResultsCount - type7KeyCounts))
+	else:
+		type7Results = type7ResultsCount/type7KeyCounts
+
+	type8Results = 0
+	if type8ResultsCount > type8KeyCounts:
+		type8Results = 1.0 - (type8Proportion*(type8ResultsCount - type8KeyCounts))
+	else:
+		type8Results = type8ResultsCount/type8KeyCounts
+
+	type9Results = 0
+	if type9ResultsCount > type9KeyCounts:
+		type9Results = 1.0 - (type9Proportion*(type9ResultsCount - type9KeyCounts))
+	else:
+		type9Results = type9ResultsCount/type9KeyCounts
+
+
 	# compute total prediction results
 	allPredictionResults = type1Results + type2Results + type3Results + type4Results + type5Results + type6Results + type7Results
 	+ type8Results + type9Results
 
 	totalPredictionResults = allPredictionResults/9
 
-	print "Accuracy determing by = Number_of_Type_Predicted / Actual_Number_of_Type"
-	print "Type 1 accuracy - {type1ResultsCount}/{type1KeyCounts} = {type1Results}".format(type1ResultsCount=type1ResultsCount, 
+	print "Accuracy determined by:"
+	print "if number of predictions > total known cells of type:"
+	print "    accuracy = 1.0 - ((1/number_cells_type) * (number of predictions - known number of cells)"
+	print "else:"
+	print "    accuracy = Number_of_Type_Predicted / Actual_Number_of_Type"
+	print "Type 1 accuracy (predictions: {type1ResultsCount}, known: {type1KeyCounts}) = {type1Results}".format(type1ResultsCount=type1ResultsCount, 
 		type1KeyCounts=type1KeyCounts, type1Results=type1Results)
-	print "Type 2 accuracy - {type2ResultsCount}/{type2KeyCounts} = {type2Results}".format(type2ResultsCount=type2ResultsCount, 
+	print "Type 2 accuracy (predictions: {type2ResultsCount}, known: {type2KeyCounts}) = {type2Results}".format(type2ResultsCount=type2ResultsCount, 
 		type2KeyCounts=type2KeyCounts, type2Results=type2Results)
-	print "Type 3 accuracy - {type3ResultsCount}/{type3KeyCounts} = {type3Results}".format(type3ResultsCount=type3ResultsCount, 
+	print "Type 3 accuracy (predictions: {type3ResultsCount}, known: {type3KeyCounts}) = {type3Results}".format(type3ResultsCount=type3ResultsCount, 
 		type3KeyCounts=type3KeyCounts, type3Results=type3Results)
-	print "Type 4 accuracy - {type4ResultsCount}/{type4KeyCounts} = {type4Results}".format(type4ResultsCount=type4ResultsCount, 
+	print "Type 4 accuracy (predictions: {type4ResultsCount}, known: {type4KeyCounts}) = {type4Results}".format(type4ResultsCount=type4ResultsCount, 
 		type4KeyCounts=type4KeyCounts, type4Results=type4Results)
-	print "Type 5 accuracy - {type5ResultsCount}/{type5KeyCounts} = {type5Results}".format(type5ResultsCount=type5ResultsCount, 
+	print "Type 5 accuracy (predictions: {type5ResultsCount}, known: {type5KeyCounts}) = {type5Results}".format(type5ResultsCount=type5ResultsCount, 
 		type5KeyCounts=type5KeyCounts, type5Results=type5Results)
-	print "Type 6 accuracy - {type6ResultsCount}/{type6KeyCounts} = {type6Results}".format(type6ResultsCount=type6ResultsCount, 
+	print "Type 6 accuracy (predictions: {type6ResultsCount}, known: {type6KeyCounts}) = {type6Results}".format(type6ResultsCount=type6ResultsCount, 
 		type6KeyCounts=type6KeyCounts, type6Results=type6Results)
-	print "Type 7 accuracy - {type7ResultsCount}/{type7KeyCounts} = {type7Results}".format(type7ResultsCount=type7ResultsCount, 
+	print "Type 7 accuracy (predictions: {type7ResultsCount}, known: {type7KeyCounts}) = {type7Results}".format(type7ResultsCount=type7ResultsCount, 
 		type7KeyCounts=type7KeyCounts, type7Results=type7Results)
-	print "Type 8 accuracy - {type8ResultsCount}/{type8KeyCounts} = {type8Results}".format(type8ResultsCount=type8ResultsCount, 
+	print "Type 8 accuracy (predictions: {type8ResultsCount}, known: {type8KeyCounts}) = {type8Results}".format(type8ResultsCount=type8ResultsCount, 
 		type8KeyCounts=type8KeyCounts, type8Results=type8Results)
-	print "Type 9 accuracy - {type9ResultsCount}/{type9KeyCounts} = {type9Results}".format(type9ResultsCount=type9ResultsCount, 
+	print "Type 9 accuracy (predictions: {type9ResultsCount}, known: {type9KeyCounts}) = {type9Results}".format(type9ResultsCount=type9ResultsCount, 
 		type9KeyCounts=type9KeyCounts, type9Results=type9Results)
 	print "Total accuracy (all prediction results/9) = {totalPredictionResults}".format(totalPredictionResults=totalPredictionResults)
-
-
-
-

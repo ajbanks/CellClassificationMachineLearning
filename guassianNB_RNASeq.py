@@ -19,7 +19,7 @@ def fitTrainingData(training_data, nSamples):
 	gnb.fit(training_dataNP, nSamplesNP)
 
 def predictTestData(testing_data):
-	print "\npredicting test data on gaussian naive bayes classifier"
+	print "predicting test data on gaussian naive bayes classifier"
 	
 	# make list into np array
 	testing_dataNP = np.array(testing_data)
