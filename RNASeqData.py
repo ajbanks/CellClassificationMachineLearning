@@ -2,13 +2,13 @@ import sys
 import random
 
 class RNASeqData(object):
-	rawDataFileName = "GSE60361C13005Expression.txt"
-	annotationsFileName = "expressionmRNAAnnotations.txt"
 
 	# annotationsFileName = "";
 
-	def __init__(self):
+	def __init__(self, raw_data_file, annotations_file):
 		print "\ninitializing RNASeqData"
+		self.raw_data_file = raw_data_file
+		self.annotations_file = annotations_file
 
 	# initial raw data read from database file
 	def setRawData(self, rawData):
@@ -37,7 +37,7 @@ class RNASeqData(object):
 	def setFeatures(self, features):
 		self.features = features
 
-	def makeTrainingAndTestingData(self):
+	def makeDSTrainingAndTestingData(self):
 		print "\npartitioning data set - 70% training, 30% testing"
 		# randomly selecte 70% of each cluster for training, 30% for training
 
@@ -263,7 +263,7 @@ class RNASeqData(object):
 			iterator += 1
 
 		# add the training cells and target values to class wide variables in parallel 1-9
-		self.trainingData = []
+		self.dsTrainingData = []
 		targetValuesIdxs = []
 
 		if len(type1TrainingCells) != len(type1TrainingCellIdxsAnn):
@@ -271,7 +271,7 @@ class RNASeqData(object):
 		else:
 			iterator = 0
 			for cell in type1TrainingCells:
-				self.trainingData.append(cell)
+				self.dsTrainingData.append(cell)
 				targetValuesIdxs.append(type1TrainingCellIdxsAnn[iterator])
 				iterator += 1
 
@@ -280,7 +280,7 @@ class RNASeqData(object):
 		else:
 			iterator = 0
 			for cell in type2TrainingCells:
-				self.trainingData.append(cell)
+				self.dsTrainingData.append(cell)
 				targetValuesIdxs.append(type2TrainingCellIdxsAnn[iterator])
 				iterator += 1
 
@@ -289,7 +289,7 @@ class RNASeqData(object):
 		else:
 			iterator = 0
 			for cell in type3TrainingCells:
-				self.trainingData.append(cell)
+				self.dsTrainingData.append(cell)
 				targetValuesIdxs.append(type3TrainingCellIdxsAnn[iterator])
 				iterator += 1
 
@@ -298,7 +298,7 @@ class RNASeqData(object):
 		else:
 			iterator = 0
 			for cell in type4TrainingCells:
-				self.trainingData.append(cell)
+				self.dsTrainingData.append(cell)
 				targetValuesIdxs.append(type4TrainingCellIdxsAnn[iterator])
 				iterator += 1
 
@@ -307,7 +307,7 @@ class RNASeqData(object):
 		else:
 			iterator = 0
 			for cell in type5TrainingCells:
-				self.trainingData.append(cell)
+				self.dsTrainingData.append(cell)
 				targetValuesIdxs.append(type5TrainingCellIdxsAnn[iterator])
 				iterator += 1
 
@@ -316,7 +316,7 @@ class RNASeqData(object):
 		else:
 			iterator = 0
 			for cell in type6TrainingCells:
-				self.trainingData.append(cell)
+				self.dsTrainingData.append(cell)
 				targetValuesIdxs.append(type6TrainingCellIdxsAnn[iterator])
 				iterator += 1
 
@@ -325,7 +325,7 @@ class RNASeqData(object):
 		else:
 			iterator = 0
 			for cell in type7TrainingCells:
-				self.trainingData.append(cell)
+				self.dsTrainingData.append(cell)
 				targetValuesIdxs.append(type7TrainingCellIdxsAnn[iterator])
 				iterator += 1
 
@@ -334,7 +334,7 @@ class RNASeqData(object):
 		else:
 			iterator = 0
 			for cell in type8TrainingCells:
-				self.trainingData.append(cell)
+				self.dsTrainingData.append(cell)
 				targetValuesIdxs.append(type8TrainingCellIdxsAnn[iterator])
 				iterator += 1
 
@@ -343,18 +343,18 @@ class RNASeqData(object):
 		else:
 			iterator = 0
 			for cell in type9TrainingCells:
-				self.trainingData.append(cell)
+				self.dsTrainingData.append(cell)
 				targetValuesIdxs.append(type9TrainingCellIdxsAnn[iterator])
 				iterator += 1
 
 
 		# now that we have the indexes of the target values that correspond to the annotations, make a list of these identifiers
-		self.targetValues = []
+		self.dsTargetValues = []
 		for idx in targetValuesIdxs:
-			self.targetValues.append(int(self.cellIdentifierAnnotations[idx]))
+			self.dsTargetValues.append(int(self.cellIdentifierAnnotations[idx]))
 
 		# set the class wide variable testing data
-		self.testingData = testingData
+		self.dsTestingData = testingData
 
 		# add the indices corresponding to identifier annotations for the testing data in parallel 1-9
 		testingDataIdxsAnn = []
@@ -387,12 +387,12 @@ class RNASeqData(object):
 			testingDataIdxsAnn.append(idx)
 
 		# now that we have the indexes of the testing data target values that correspond to the annotations, make a list of these identifiers
-		self.testingDataTargetValues = []
+		self.dsTestingDataTargetValues = []
 		for idx in testingDataIdxsAnn:
-			self.testingDataTargetValues.append(int(self.cellIdentifierAnnotations[idx]))
+			self.dsTestingDataTargetValues.append(int(self.cellIdentifierAnnotations[idx]))
 
-		numTrainingDataCells = len(self.trainingData)
-		numTestingDataCells = len(self.testingData)
+		numTrainingDataCells = len(self.dsTrainingData)
+		numTestingDataCells = len(self.dsTestingData)
 
 		print "number training cells = {numTrainingDataCells}".format(numTrainingDataCells=numTrainingDataCells)
 		print "number testing cells = {numTestingDataCells}".format(numTestingDataCells=numTestingDataCells)
@@ -400,6 +400,55 @@ class RNASeqData(object):
 		print "- total down sampled cells = {dsCells}".format(dsCells=len(self.dsCluster_MoleculeData))
 		print "- down sampled cells * .7 = {dsCellsTraining} --> approx.".format(dsCellsTraining=int(len(self.dsCluster_MoleculeData)*.7))
 		print "- down sampled cells * .3 = {dsCellsTesting} --> approx.".format(dsCellsTesting=int(len(self.dsCluster_MoleculeData)*.3))
+
+	def makeTrainingAndTestingData(self):
+		print "\npartitioning data set - random 70% traning, 30% testing"
+		# training data (random 70%, 30%), target values for training data
+		# testing data, target values for training data
+
+		# generate a list of indices 0-numCellsTotal to use to randomly select cells
+		indices = range(self.getNumCellsRaw())
+
+		# find number of cells which constitue 70% the raw data
+		numTrainingCells = int(int(self.getNumCellsRaw())*.7)
+		
+		# randomly select 70% of the indices of each type
+		trainingCellIdxs = random.sample(indices, numTrainingCells)
+
+		# initialize training cells and training target values lists and testings cell and testing target values lists
+		self.trainingCells = []
+		self.trainingCellsTargetValues = []
+		self.testingCells = []
+		self.testingCellsTargetValues = []
+
+		idx = 0
+		while idx < self.getNumCellsRaw():
+			if idx in trainingCellIdxs:
+				self.trainingCells.append(self.rawData[idx])
+				self.trainingCellsTargetValues.append(int(self.cellIdentifierAnnotations[idx]))
+			else:
+				self.testingCells.append(self.rawData[idx])
+				self.testingCellsTargetValues.append(int(self.cellIdentifierAnnotations[idx]))
+
+			idx += 1
+		
+		numTrainingDataCells = len(self.trainingCells)
+		numTestingDataCells = len(self.testingCells)
+
+		print "number training cells = {numTrainingDataCells}".format(numTrainingDataCells=numTrainingDataCells)
+		print "number testing cells = {numTestingDataCells}".format(numTestingDataCells=numTestingDataCells)
+		print "reference:"
+		print "- total cells = {numCells}".format(numCells=self.getNumCellsRaw())
+		print "- total cells * .7 = {cellsTraining} --> approx.".format(cellsTraining=numTrainingCells)
+		print "- total cells cells * .3 = {cellsTesting} --> approx.".format(cellsTesting=int(self.getNumCellsRaw()*.3))
+
+
+
+	def getRawDataFileName(self):
+		return self.raw_data_file
+
+	def getAnnotationsFileName(self):
+		return self.annotations_file
 
 	def getRandIndices(self):
 		return self.randIndices
@@ -413,20 +462,32 @@ class RNASeqData(object):
 	def getDSCluster_MoleculeData(self):
 		return self.dsCluster_MoleculeData
 
-	def getTrainingData(self):
-		return self.trainingData
+	def getDSTrainingData(self):
+		return self.dsTrainingData
 
-	def getTestingData(self):
-		return self.testingData
+	def getDSTestingData(self):
+		return self.dsTestingData
 
 	def getFeatures(self):
 		return self.features
 
-	def getTargetValues(self):
-		return self.targetValues
+	def getDSTargetValues(self):
+		return self.dsTargetValues
+
+	def getDSTestingDataTargetValues(self):
+		return self.dsTestingDataTargetValues
+
+	def getTrainingData(self):
+		return self.trainingCells
+
+	def getTrainingDataTargetValues(self):
+		return self.trainingCellsTargetValues
+
+	def getTestingData(self):
+		return self.testingCells
 
 	def getTestingDataTargetValues(self):
-		return self.testingDataTargetValues
+		return self.testingCellsTargetValues
 
 	def getCellIdentifierAnnotations(self):
 		return self.cellIdentifierAnnotations
