@@ -443,6 +443,111 @@ class RNASeqData(object):
 		print "- total cells cells * .3 = {cellsTesting} --> approx.".format(cellsTesting=int(self.getNumCellsRaw()*.3))
 
 
+	def makeCrossValidationTrainingAndTestingData(self, downSampleFlag):
+		if downSampleFlag:
+			print "\npartitioning down sampled data set into 10 folds for 10-fold cross validation"
+
+			# divide the list into 1/10 folds
+			foldSize = len(self.getRandIndices()) / 10
+
+			folds = []
+			fold = []
+			iterator = 1
+			for randIdx in self.getRandIndices():
+				if iterator <= foldSize:
+					# add the cell to the fold
+					fold.append(self.getRawData()[randIdx])
+
+					# increment iterator
+					iterator += 1
+				else:
+					# add the fold to folds
+					folds.append(fold)
+
+					# clear fold
+					fold = []
+
+					# add current cell as first in new fold
+					fold.append(self.getRawData()[randIdx])
+
+					# set iterator to 2
+					iterator = 2
+
+			# add any remaining cells to the first fold
+			for cell in fold:
+				folds[0].append(cell)
+
+			# set the list of folds to a class wide variables
+			self.folds = folds
+
+			return
+
+
+		else:
+			print "\npartitioning raw data set into 10 folds for 10-fold cross validation"
+
+			# initialize a list of indices corresponding to the numbers of cells in the data set
+			indices = range(self.getNumCellsRaw())
+
+			# randomly shuffle the list
+			random.shuffle(indices)
+
+			# divide the list into 1/10 folds
+			foldSize = len(indices) / 10
+
+			folds = []
+			foldsKey = [] # a parallel 2D array that holds the annotations for all folds
+			fold = []
+			foldKey = [] # a parallel list that holds the annotations for a single fold
+			iterator = 1
+			idx = 0
+			for cell in self.getRawData():
+				if iterator <= foldSize:
+					# add the cell to the fold
+					fold.append(self.getRawData()[idx])
+
+					# add the annotation to the fold key
+					foldKey.append(self.getCellIdentifierAnnotations()[idx])
+
+					# increment iterator and idx
+					iterator += 1
+					idx += 1
+				else:
+					# add the fold to folds
+					folds.append(fold)
+
+					# add the fold key to fold keys
+					foldsKey.append(foldKey)
+
+					# clear fold
+					fold = []
+
+					# clear fold key
+					foldKey = []
+
+					# add current cell as first in new fold
+					fold.append(self.getRawData()[idx])
+
+					# add current cell key as first key in new fold key
+					foldKey.append(self.getCellIdentifierAnnotations()[idx])
+
+					# set iterator to 2
+					iterator = 2
+
+					# incremenet idx
+					idx += 1
+
+
+			# add any remaining cells to the first fold
+			for cell in fold:
+				folds[0].append(cell)
+
+			# set the list of folds to a class wide variables
+			self.folds = folds
+
+			return
+
+
 
 	def getRawDataFileName(self):
 		return self.raw_data_file

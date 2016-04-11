@@ -10,23 +10,29 @@ import analysis
 # Resource: http://machinelearningmastery.com/get-your-hands-dirty-with-scikit-learn-now/
 # Python for Java Programmers: http://python4java.necaiseweb.org/Fundamentals/TheBasics
 
-# run with downsampling: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 1
-# run without downsampling: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 0
+# run with down sampling and cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 1 1
+# run with down sampling and without cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 1 0
+# run without downsampling and with cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 0 1
+# run without downsampling and without cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 0 0
 
 if __name__ == '__main__':
 	t0 = time.clock()
 	print "start"
 	
 	# check for correct number of args
-	if len(sys.argv) != 4:
-		print "Usage: python main.py <raw_data_file> <annotations_file> <down sample? --> 0,1>"
+	if len(sys.argv) != 5:
+		print "Usage: python main.py <raw_data_file> <annotations_file> <down sample? --> 0,1> <cross validate? ---> 0,1>"
 		sys.exit(0)
 
 	raw_data_file = sys.argv[1]
 	annotations_file = sys.argv[2]
 	downSampleFlag = False
+	crossValidateFlag = False
 	if sys.argv[3] == "1":
 		downSampleFlag = True
+	if sys.argv[4] == "1":
+		crossValidateFlag = True
+
 
 	print "Using:"
 	print " - raw data: {raw}".format(raw=raw_data_file)
@@ -35,6 +41,10 @@ if __name__ == '__main__':
 		print "** Down sampling enabled **"
 	else:
 		print "** Down sampling disabled **"
+	if crossValidateFlag:
+		print "** Cross validation enabled **"
+	else:
+		print "** Cross validation disabled **"
 
 
 	# initialize the data set class
@@ -66,29 +76,37 @@ if __name__ == '__main__':
 		data.setDSCluster_MoleculeData(preprocess.downSampleByMoleculeCount(data.getDSClusterData(),
 			data.getMoleculeCountAnnotations(), data.getRandIndices()))
 
-		# partition the down sampled data set into 70% training and 30% testing
-		data.makeDSTrainingAndTestingData()
+		if crossValidateFlag:
+			data.makeCrossValidationTrainingAndTestingData(downSampleFlag)
 
-		# fit down sampled training data to gaussian nb
-		guassianNB_RNASeq.fitTrainingData(data.getDSTrainingData(), data.getDSTargetValues())
+			
+		else:
+			# partition the down sampled data set into 70% training and 30% testing
+			data.makeDSTrainingAndTestingData()
 
-		# predict values using gaussian nb with down sampled data
-		guassianNB_predictionResults = guassianNB_RNASeq.predictTestData(data.getDSTestingData())
-	
-		# analyze results of guassian nb on down sampled data
-		analysis.analyzeResults("Guassian Naive Bayes", guassianNB_predictionResults, data.getDSTestingDataTargetValues())
+			# fit down sampled training data to gaussian nb
+			guassianNB_RNASeq.fitTrainingData(data.getDSTrainingData(), data.getDSTargetValues())
+
+			# predict values using gaussian nb with down sampled data
+			guassianNB_predictionResults = guassianNB_RNASeq.predictTestData(data.getDSTestingData())
+		
+			# analyze results of guassian nb on down sampled data
+			analysis.analyzeResults("Guassian Naive Bayes", guassianNB_predictionResults, data.getDSTestingDataTargetValues())
 	else:
-		# partition the data set into 70% training and 30% testing
-		data.makeTrainingAndTestingData()
+		if crossValidateFlag:
+			data.makeCrossValidationTrainingAndTestingData(downSampleFlag)
+		else:
+			# partition the data set into 70% training and 30% testing
+			data.makeTrainingAndTestingData()
 
-		# fit training data to gaussian nb
-		guassianNB_RNASeq.fitTrainingData(data.getTrainingData(), data.getTrainingDataTargetValues())
+			# fit training data to gaussian nb
+			guassianNB_RNASeq.fitTrainingData(data.getTrainingData(), data.getTrainingDataTargetValues())
 
-		# predict values using gaussian nb with down sampled data
-		guassianNB_predictionResults = guassianNB_RNASeq.predictTestData(data.getTestingData())
-	
-		# analyze results of guassian nb on down sampled data
-		analysis.analyzeResults("Guassian Naive Bayes", guassianNB_predictionResults, data.getTestingDataTargetValues())
+			# predict values using gaussian nb with down sampled data
+			guassianNB_predictionResults = guassianNB_RNASeq.predictTestData(data.getTestingData())
+		
+			# analyze results of guassian nb on down sampled data
+			analysis.analyzeResults("Guassian Naive Bayes", guassianNB_predictionResults, data.getTestingDataTargetValues())
 	
 
 	print "\nprogram execution: {t} seconds".format(t=time.clock()-t0)
