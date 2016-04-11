@@ -450,13 +450,23 @@ class RNASeqData(object):
 			# divide the list into 1/10 folds
 			foldSize = len(self.getRandIndices()) / 10
 
+			randIndicesLocal = self.getRandIndices()
+
+			# randomly shuffle the list
+			random.shuffle(randIndicesLocal)
+
 			folds = []
+			foldsKey = []
 			fold = []
+			foldKey = []
 			iterator = 1
-			for randIdx in self.getRandIndices():
+			for randIdx in randIndicesLocal:
 				if iterator <= foldSize:
 					# add the cell to the fold
 					fold.append(self.getRawData()[randIdx])
+
+					# add the annotation to the fold key
+					foldKey.append(int(self.getCellIdentifierAnnotations()[randIdx]))
 
 					# increment iterator
 					iterator += 1
@@ -464,21 +474,36 @@ class RNASeqData(object):
 					# add the fold to folds
 					folds.append(fold)
 
+					# add the fold key to the fold keys
+					foldsKey.append(foldKey)
+
 					# clear fold
 					fold = []
+
+					# clear fold key
+					foldKey = []
 
 					# add current cell as first in new fold
 					fold.append(self.getRawData()[randIdx])
 
+					# add current cell key as first key in new fold key
+					foldKey.append(int(self.getCellIdentifierAnnotations()[randIdx]))
+
 					# set iterator to 2
 					iterator = 2
 
-			# add any remaining cells to the first fold
+			# add any remaining cells and annotations to the first fold
 			for cell in fold:
 				folds[0].append(cell)
 
-			# set the list of folds to a class wide variables
+			for ann in foldKey:
+				foldsKey[0].append(int(ann))
+
+			# set the list of folds to a class wide variable
 			self.folds = folds
+
+			# set the list of keys to a class wide variable
+			self.foldsKey = foldsKey
 
 			return
 
@@ -507,7 +532,7 @@ class RNASeqData(object):
 					fold.append(self.getRawData()[idx])
 
 					# add the annotation to the fold key
-					foldKey.append(self.getCellIdentifierAnnotations()[idx])
+					foldKey.append(int(self.getCellIdentifierAnnotations()[idx]))
 
 					# increment iterator and idx
 					iterator += 1
@@ -529,7 +554,7 @@ class RNASeqData(object):
 					fold.append(self.getRawData()[idx])
 
 					# add current cell key as first key in new fold key
-					foldKey.append(self.getCellIdentifierAnnotations()[idx])
+					foldKey.append(int(self.getCellIdentifierAnnotations()[idx]))
 
 					# set iterator to 2
 					iterator = 2
@@ -538,12 +563,18 @@ class RNASeqData(object):
 					idx += 1
 
 
-			# add any remaining cells to the first fold
+			# add any remaining cells and annotations to the first fold
 			for cell in fold:
 				folds[0].append(cell)
 
+			for ann in foldKey:
+				foldsKey[0].append(int(ann))
+
 			# set the list of folds to a class wide variables
 			self.folds = folds
+
+			# set the list of keys to a class wide variable
+			self.foldsKey = foldsKey
 
 			return
 
@@ -593,6 +624,12 @@ class RNASeqData(object):
 
 	def getTestingDataTargetValues(self):
 		return self.testingCellsTargetValues
+
+	def getFolds(self):
+		return self.folds
+
+	def getFoldsKey(self):
+		return self.foldsKey
 
 	def getCellIdentifierAnnotations(self):
 		return self.cellIdentifierAnnotations

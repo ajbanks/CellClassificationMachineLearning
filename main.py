@@ -21,7 +21,7 @@ if __name__ == '__main__':
 	
 	# check for correct number of args
 	if len(sys.argv) != 5:
-		print "Usage: python main.py <raw_data_file> <annotations_file> <down sample? --> 0,1> <cross validate? ---> 0,1>"
+		print "Usage: python main.py <raw_data_file> <annotations_file> <down sample? --> 0,1> <cross validate? --> 0,1>"
 		sys.exit(0)
 
 	raw_data_file = sys.argv[1]
@@ -77,24 +77,81 @@ if __name__ == '__main__':
 			data.getMoleculeCountAnnotations(), data.getRandIndices()))
 
 		if crossValidateFlag:
+			# make 10-fold cross validation data
 			data.makeCrossValidationTrainingAndTestingData(downSampleFlag)
 
-			
+			folds = data.getFolds()
+
+			foldsKey = data.getFoldsKey()
+
+			# make sure the data is parallel
+			if len(folds) != len(foldsKey) or len(folds[0]) != len(foldsKey[0]):
+				print "error: folds and folds key are not parallel data sets"
+				sys.exit(0)
+
+			print "\nfitting training data and predicting testing data with gaussian naive bayes classifier"
+			iterator = 0 # we'll use this to iterate through folds and use each as the training data
+			accuracyResults = []
+			while iterator < 10:
+				testingData = folds[iterator]
+				testingDataKey = foldsKey[iterator]
+
+				# make 2D arrays of training cells and keys
+				trainingFolds = []
+				trainingKeys = []
+				i = 0
+				while i < 10:
+					if i != iterator:
+						for cell in folds[i]:
+							trainingFolds.append(cell)
+						for key in foldsKey[i]:
+							trainingKeys.append(key)
+					i += 1
+
+				# fit the 9 training folds using nb classifier
+				guassianNB_RNASeq.fitTrainingData(trainingFolds, trainingKeys)
+
+				# make predictions on the 1 testing fold using nb classifier
+				guassianNB_predictionResults = guassianNB_RNASeq.predictTestData(testingData)
+
+				# add the accuracies for this fold to accuracies list
+				accuracyResults.append(analysis.analyzeFoldResults(guassianNB_predictionResults, testingDataKey))
+
+				# increment iterator to process the next fold as testing data
+				iterator += 1
+
+			print "analyzing results..."
+			analysis.analyzeCrossValidationAccuracyResults(accuracyResults)
+
 		else:
 			# partition the down sampled data set into 70% training and 30% testing
 			data.makeDSTrainingAndTestingData()
 
 			# fit down sampled training data to gaussian nb
+			print "\nfitting training data to gaussian naive bayes classifier"
 			guassianNB_RNASeq.fitTrainingData(data.getDSTrainingData(), data.getDSTargetValues())
 
 			# predict values using gaussian nb with down sampled data
+			print "predicting test data on gaussian naive bayes classifier"
 			guassianNB_predictionResults = guassianNB_RNASeq.predictTestData(data.getDSTestingData())
 		
 			# analyze results of guassian nb on down sampled data
 			analysis.analyzeResults("Guassian Naive Bayes", guassianNB_predictionResults, data.getDSTestingDataTargetValues())
+
 	else:
 		if crossValidateFlag:
+			# make 10-fold cross validation data
 			data.makeCrossValidationTrainingAndTestingData(downSampleFlag)
+
+			folds = data.getFolds()
+
+			foldsKey = data.getFoldsKey()
+
+			# make sure the data is parallel
+			if len(folds) != len(foldsKey) or len(folds[0]) != len(foldsKey[0]):
+				print "error: folds and folds key are not parallel data sets"
+				sys.exit(0)
+
 		else:
 			# partition the data set into 70% training and 30% testing
 			data.makeTrainingAndTestingData()

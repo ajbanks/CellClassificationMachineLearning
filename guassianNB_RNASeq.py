@@ -5,7 +5,6 @@ gnb = GaussianNB()
 
 # Source: http://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html#sklearn.naive_bayes.GaussianNB.fit
 def fitTrainingData(training_data, nSamples):
-	print "\nfitting training data to gaussian naive bayes classifier"
 
 	# fit(X,Y)
 		# x = 2D array of cells
@@ -19,7 +18,6 @@ def fitTrainingData(training_data, nSamples):
 	gnb.fit(training_dataNP, nSamplesNP)
 
 def predictTestData(testing_data):
-	print "predicting test data on gaussian naive bayes classifier"
 	
 	# make list into np array
 	testing_dataNP = np.array(testing_data)
