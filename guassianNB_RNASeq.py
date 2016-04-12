@@ -5,7 +5,6 @@ gnb = GaussianNB()
 
 # Source: http://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html#sklearn.naive_bayes.GaussianNB.fit
 def fitTrainingData(training_data, nSamples):
-
 	# fit(X,Y)
 		# x = 2D array of cells
 		# y = 1D list of classifiers i.e. [group1, group1, group2, group2]
