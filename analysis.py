@@ -3,26 +3,303 @@ import sys
 import math
 import numpy as np
 
-def analyzeFoldResults(predictions, answerKey):
+# this will calculate and store a 2D list with evaluations for each type in the order [accuracy, sensitivity, specificity, MCC, F1]
+def calculateEvaluations(predictions, answerKey):
 	# make sure lengths are equal
 	if len(predictions) != len(answerKey):
 		print "error: discrepancy between number of prediction results and answey keys"
 
-	type1ConfusionMatrix = calculateConfusionMatrix(predictions, answerKey, 1)
 
-	print type1ConfusionMatrix
+	# confusionMatrix = [truePositives, falsePositives, falseNegatives, trueNegatives]
 
-def analyzeCrossValidationAccuracyResults(accuracyResults, k=10):
-	print "calculating average accuracy for {k}-fold cross validation".format(k=k)
-	avg = np.mean(accuracyResults)
-	print "Prediction results of 10-fold cross validation: {avg}".format(avg=avg)
+	foldEvaluations = []
 
-def analyzeResults(classifier, predictions, answerKey):
-	print "\nanalyzing results for {classifier} classifier".format(classifier=classifier)
+	iterator = 1
+	while iterator < 10: # confusion matrix for each type
+		confusionMatrix = calculateConfusionMatrix(predictions, answerKey, iterator)
+		foldEvaluation = calculateFoldEvaluations(confusionMatrix)
+		foldEvaluations.append(foldEvaluation)
+		iterator += 1
+
+	return foldEvaluations
+
+def calculateFoldEvaluations(confusionMatrix):
+	accuracy = calculateAccurary(confusionMatrix[0], confusionMatrix[3], confusionMatrix[1], confusionMatrix[2])
+	sensitivity = calculateSensitivity(confusionMatrix[0], confusionMatrix[1])
+	specificity = calculateSpecificity(confusionMatrix[3], confusionMatrix[1])
+	mcc = calculateMCC(confusionMatrix[0], confusionMatrix[3], confusionMatrix[1], confusionMatrix[2])
+	f1Score = calculateF1Score(confusionMatrix[0], confusionMatrix[1], confusionMatrix[2])
+
+	foldEvaluation = [accuracy, sensitivity, specificity, mcc, f1Score]
+
+	return foldEvaluation
+
+def analyzeResultsRobust(foldsEvaluations, k):
+	print "\nanalyzing evaluations for {k}-fold cross validation".format(k=k)
+
+	if len(foldsEvaluations) != k and len(foldsEvaluations[0]) != 9 and len(foldsEvaluations[0][0]) != 5:
+		print "error: 3D evaluations list is incorrect size"
+		return
+
+	# initialize values for avg accuracy, sensitivity, specificity, MCC, F1Score for each class and for all classes
+	type1AccuracyTotal = 0
+	type2AccuracyTotal = 0
+	type3AccuracyTotal = 0
+	type4AccuracyTotal = 0
+	type5AccuracyTotal = 0
+	type6AccuracyTotal = 0
+	type7AccuracyTotal = 0
+	type8AccuracyTotal = 0
+	type9AccuracyTotal = 0
+
+	type1SensitivityTotal = 0
+	type2SensitivityTotal = 0
+	type3SensitivityTotal = 0
+	type4SensitivityTotal = 0
+	type5SensitivityTotal = 0
+	type6SensitivityTotal = 0
+	type7SensitivityTotal = 0
+	type8SensitivityTotal = 0
+	type9SensitivityTotal = 0
+
+	type1SpecificityTotal = 0
+	type2SpecificityTotal = 0
+	type3SpecificityTotal = 0
+	type4SpecificityTotal = 0
+	type5SpecificityTotal = 0
+	type6SpecificityTotal = 0
+	type7SpecificityTotal = 0
+	type8SpecificityTotal = 0
+	type9SpecificityTotal = 0
+
+	type1MCCTotal = 0
+	type2MCCTotal = 0
+	type3MCCTotal = 0
+	type4MCCTotal = 0
+	type5MCCTotal = 0
+	type6MCCTotal = 0
+	type7MCCTotal = 0
+	type8MCCTotal = 0
+	type9MCCTotal = 0
+
+	type1F1ScoreTotal = 0
+	type2F1ScoreTotal = 0
+	type3F1ScoreTotal = 0
+	type4F1ScoreTotal = 0
+	type5F1ScoreTotal = 0
+	type6F1ScoreTotal = 0
+	type7F1ScoreTotal = 0
+	type8F1ScoreTotal = 0
+	type9F1ScoreTotal = 0
+
+	iterator = 0
+	while iterator < k:
+		#type 1 values
+		type1AccuracyTotal += foldsEvaluations[iterator][0][0]
+		type1SensitivityTotal += foldsEvaluations[iterator][0][1]
+		type1SpecificityTotal += foldsEvaluations[iterator][0][2]
+		type1MCCTotal += foldsEvaluations[iterator][0][3]
+		type1F1ScoreTotal += foldsEvaluations[iterator][0][4]
+
+		#type 2 values
+		type2AccuracyTotal += foldsEvaluations[iterator][1][0]
+		type2SensitivityTotal += foldsEvaluations[iterator][1][1]
+		type2SpecificityTotal += foldsEvaluations[iterator][1][2]
+		type2MCCTotal += foldsEvaluations[iterator][1][3]
+		type2F1ScoreTotal += foldsEvaluations[iterator][1][4]
+
+		#type 3 values
+		type3AccuracyTotal += foldsEvaluations[iterator][2][0]
+		type3SensitivityTotal += foldsEvaluations[iterator][2][1]
+		type3SpecificityTotal += foldsEvaluations[iterator][2][2]
+		type3MCCTotal += foldsEvaluations[iterator][2][3]
+		type3F1ScoreTotal += foldsEvaluations[iterator][2][4]
+
+		#type 4 values
+		type4AccuracyTotal += foldsEvaluations[iterator][3][0]
+		type4SensitivityTotal += foldsEvaluations[iterator][3][1]
+		type4SpecificityTotal += foldsEvaluations[iterator][3][2]
+		type4MCCTotal += foldsEvaluations[iterator][3][3]
+		type4F1ScoreTotal += foldsEvaluations[iterator][3][4]
+
+		#type 5 values
+		type5AccuracyTotal += foldsEvaluations[iterator][4][0]
+		type5SensitivityTotal += foldsEvaluations[iterator][4][1]
+		type5SpecificityTotal += foldsEvaluations[iterator][4][2]
+		type5MCCTotal += foldsEvaluations[iterator][4][3]
+		type5F1ScoreTotal += foldsEvaluations[iterator][4][4]
+
+		#type 6 values
+		type6AccuracyTotal += foldsEvaluations[iterator][5][0]
+		type6SensitivityTotal += foldsEvaluations[iterator][5][1]
+		type6SpecificityTotal += foldsEvaluations[iterator][5][2]
+		type6MCCTotal += foldsEvaluations[iterator][5][3]
+		type6F1ScoreTotal += foldsEvaluations[iterator][5][4]
+
+		#type 7 values
+		type7AccuracyTotal += foldsEvaluations[iterator][6][0]
+		type7SensitivityTotal += foldsEvaluations[iterator][6][1]
+		type7SpecificityTotal += foldsEvaluations[iterator][6][2]
+		type7MCCTotal += foldsEvaluations[iterator][6][3]
+		type7F1ScoreTotal += foldsEvaluations[iterator][6][4]
+
+		#type 8 values
+		type8AccuracyTotal += foldsEvaluations[iterator][7][0]
+		type8SensitivityTotal += foldsEvaluations[iterator][7][1]
+		type8SpecificityTotal += foldsEvaluations[iterator][7][2]
+		type8MCCTotal += foldsEvaluations[iterator][7][3]
+		type8F1ScoreTotal += foldsEvaluations[iterator][7][4]
+
+		#type 9 values
+		type9AccuracyTotal += foldsEvaluations[iterator][8][0]
+		type9SensitivityTotal += foldsEvaluations[iterator][8][1]
+		type9SpecificityTotal += foldsEvaluations[iterator][8][2]
+		type9MCCTotal += foldsEvaluations[iterator][8][3]
+		type9F1ScoreTotal += foldsEvaluations[iterator][8][4]
+
+		iterator += 1
+
+	
+	# find averages for each type
+	avgAccuracyType1 = type1AccuracyTotal/k
+	avgSensitivityType1 = type1SensitivityTotal/k
+	avgSpecificityType1 = type1SpecificityTotal/k
+	avgMccType1 = type1MCCTotal/k
+	avgF1ScoreType1 = type1F1ScoreTotal/k
+
+	avgAccuracyType2 = type2AccuracyTotal/k
+	avgSensitivityType2 = type2SensitivityTotal/k
+	avgSpecificityType2 = type2SpecificityTotal/k
+	avgMccType2 = type2MCCTotal/k
+	avgF1ScoreType2 = type2F1ScoreTotal/k
+
+	avgAccuracyType3 = type3AccuracyTotal/k
+	avgSensitivityType3 = type3SensitivityTotal/k
+	avgSpecificityType3 = type3SpecificityTotal/k
+	avgMccType3 = type3MCCTotal/k
+	avgF1ScoreType3 = type3F1ScoreTotal/k
+
+	avgAccuracyType4 = type4AccuracyTotal/k
+	avgSensitivityType4 = type4SensitivityTotal/k
+	avgSpecificityType4 = type4SpecificityTotal/k
+	avgMccType4 = type4MCCTotal/k
+	avgF1ScoreType4 = type4F1ScoreTotal/k
+
+	avgAccuracyType5 = type5AccuracyTotal/k
+	avgSensitivityType5 = type5SensitivityTotal/k
+	avgSpecificityType5 = type5SpecificityTotal/k
+	avgMccType5 = type5MCCTotal/k
+	avgF1ScoreType5 = type5F1ScoreTotal/k
+
+	avgAccuracyType6 = type6AccuracyTotal/k
+	avgSensitivityType6 = type6SensitivityTotal/k
+	avgSpecificityType6 = type6SpecificityTotal/k
+	avgMccType6 = type6MCCTotal/k
+	avgF1ScoreType6 = type6F1ScoreTotal/k
+
+	avgAccuracyType7 = type7AccuracyTotal/k
+	avgSensitivityType7 = type7SensitivityTotal/k
+	avgSpecificityType7 = type7SpecificityTotal/k
+	avgMccType7 = type7MCCTotal/k
+	avgF1ScoreType7 = type7F1ScoreTotal/k
+
+	avgAccuracyType8 = type8AccuracyTotal/k
+	avgSensitivityType8 = type8SensitivityTotal/k
+	avgSpecificityType8 = type8SpecificityTotal/k
+	avgMccType8 = type8MCCTotal/k
+	avgF1ScoreType8 = type8F1ScoreTotal/k
+
+	avgAccuracyType9 = type9AccuracyTotal/k
+	avgSensitivityType9 = type9SensitivityTotal/k
+	avgSpecificityType9 = type9SpecificityTotal/k
+	avgMccType9 = type9MCCTotal/k
+	avgF1ScoreType9 = type9F1ScoreTotal/k
+
+	# find global values
+	accuracyTotal = avgAccuracyType1 + avgAccuracyType2 + avgAccuracyType3 + avgAccuracyType4 + avgAccuracyType5 + avgAccuracyType6 + avgAccuracyType7 + avgAccuracyType8 + avgAccuracyType9
+	sensitivityTotal = avgSensitivityType1 + avgSensitivityType2 + avgSensitivityType3 + avgSensitivityType4 + avgSensitivityType5 + avgSensitivityType6 + avgSensitivityType7 + avgSensitivityType8 + avgSensitivityType9
+	specificityTotal = avgSpecificityType1 + avgSpecificityType2 + avgSpecificityType3 + avgSpecificityType4 + avgSpecificityType5 + avgSpecificityType6 + avgSpecificityType7 + avgSpecificityType8 + avgSpecificityType9
+	mccTotal = avgMccType1 + avgMccType2 + avgMccType3 + avgMccType4 + avgMccType5 + avgMccType6 + avgMccType7 + avgMccType8 + avgMccType9
+	f1ScoreTotal = avgF1ScoreType1 + avgF1ScoreType2 + avgF1ScoreType3 + avgF1ScoreType4 + avgF1ScoreType5 + avgF1ScoreType6 + avgF1ScoreType7 + avgF1ScoreType8 + avgF1ScoreType9
+
+	# find global values
+	avgAccuracy = accuracyTotal/9
+	avgSensitivity = sensitivityTotal/9
+	avgSpecificity = specificityTotal/9
+	avgMcc = mccTotal/9
+	avgF1Score = f1ScoreTotal/9
+
+	print "Average accuracy per type: (BUG)"
+	print " - Type 1: {avgAccuracyType1}".format(avgAccuracyType1=avgAccuracyType1)
+	print " - Type 2: {avgAccuracyType2}".format(avgAccuracyType2=avgAccuracyType2)
+	print " - Type 3: {avgAccuracyType3}".format(avgAccuracyType3=avgAccuracyType3)
+	print " - Type 4: {avgAccuracyType4}".format(avgAccuracyType4=avgAccuracyType4)
+	print " - Type 5: {avgAccuracyType5}".format(avgAccuracyType5=avgAccuracyType5)
+	print " - Type 6: {avgAccuracyType6}".format(avgAccuracyType6=avgAccuracyType6)
+	print " - Type 7: {avgAccuracyType7}".format(avgAccuracyType7=avgAccuracyType7)
+	print " - Type 8: {avgAccuracyType8}".format(avgAccuracyType8=avgAccuracyType8)
+	print " - Type 9: {avgAccuracyType9}".format(avgAccuracyType9=avgAccuracyType9)
+
+	print "\nAverage sensitivity per type: "
+	print " - Type 1: {avgSensitivityType1}".format(avgSensitivityType1=avgSensitivityType1)
+	print " - Type 2: {avgSensitivityType2}".format(avgSensitivityType2=avgSensitivityType2)
+	print " - Type 3: {avgSensitivityType3}".format(avgSensitivityType3=avgSensitivityType3)
+	print " - Type 4: {avgSensitivityType4}".format(avgSensitivityType4=avgSensitivityType4)
+	print " - Type 5: {avgSensitivityType5}".format(avgSensitivityType5=avgSensitivityType5)
+	print " - Type 6: {avgSensitivityType6}".format(avgSensitivityType6=avgSensitivityType6)
+	print " - Type 7: {avgSensitivityType7}".format(avgSensitivityType7=avgSensitivityType7)
+	print " - Type 8: {avgSensitivityType8}".format(avgSensitivityType8=avgSensitivityType8)
+	print " - Type 9: {avgSensitivityType9}".format(avgSensitivityType9=avgSensitivityType9)
+
+	print "\nAverage specificity per type: "
+	print " - Type 1: {avgSpecificityType1}".format(avgSpecificityType1=avgSpecificityType1)
+	print " - Type 2: {avgSpecificityType2}".format(avgSpecificityType2=avgSpecificityType2)
+	print " - Type 3: {avgSpecificityType3}".format(avgSpecificityType3=avgSpecificityType3)
+	print " - Type 4: {avgSpecificityType4}".format(avgSpecificityType4=avgSpecificityType4)
+	print " - Type 5: {avgSpecificityType5}".format(avgSpecificityType5=avgSpecificityType5)
+	print " - Type 6: {avgSpecificityType6}".format(avgSpecificityType6=avgSpecificityType6)
+	print " - Type 7: {avgSpecificityType7}".format(avgSpecificityType7=avgSpecificityType7)
+	print " - Type 8: {avgSpecificityType8}".format(avgSpecificityType8=avgSpecificityType8)
+	print " - Type 9: {avgSpecificityType9}".format(avgSpecificityType9=avgSpecificityType9)
+
+	print "\nAverage MCC per type: "
+	print " - Type 1: {avgMccType1}".format(avgMccType1=avgMccType1)
+	print " - Type 2: {avgMccType2}".format(avgMccType2=avgMccType2)
+	print " - Type 3: {avgMccType3}".format(avgMccType3=avgMccType3)
+	print " - Type 4: {avgMccType4}".format(avgMccType4=avgMccType4)
+	print " - Type 5: {avgMccType5}".format(avgMccType5=avgMccType5)
+	print " - Type 6: {avgMccType6}".format(avgMccType6=avgMccType6)
+	print " - Type 7: {avgMccType7}".format(avgMccType7=avgMccType7)
+	print " - Type 8: {avgMccType8}".format(avgMccType8=avgMccType8)
+	print " - Type 9: {avgMccType9}".format(avgMccType9=avgMccType9)
+
+	print "\nAverage F1 Score per type: "
+	print " - Type 1: {avgF1ScoreType1}".format(avgF1ScoreType1=avgF1ScoreType1)
+	print " - Type 2: {avgF1ScoreType2}".format(avgF1ScoreType2=avgF1ScoreType2)
+	print " - Type 3: {avgF1ScoreType3}".format(avgF1ScoreType3=avgF1ScoreType3)
+	print " - Type 4: {avgF1ScoreType4}".format(avgF1ScoreType4=avgF1ScoreType4)
+	print " - Type 5: {avgF1ScoreType5}".format(avgF1ScoreType5=avgF1ScoreType5)
+	print " - Type 6: {avgF1ScoreType6}".format(avgF1ScoreType6=avgF1ScoreType6)
+	print " - Type 7: {avgF1ScoreType7}".format(avgF1ScoreType7=avgF1ScoreType7)
+	print " - Type 8: {avgF1ScoreType8}".format(avgF1ScoreType8=avgF1ScoreType8)
+	print " - Type 9: {avgF1ScoreType9}".format(avgF1ScoreType9=avgF1ScoreType9)
+
+	print "\n Average global values: "
+	print " - Accuracy: {avgAccuracy}".format(avgAccuracy=avgAccuracy)
+	print " - Sensitivity: {avgSensitivity}".format(avgSensitivity=avgSensitivity)
+	print " - Specificity: {avgSpecificity}".format(avgSpecificity=avgSpecificity)
+	print " - MCC: {avgMcc}".format(avgMcc=avgMcc)
+	print " - F1 Score: {avgF1Score}".format(avgF1Score=avgF1Score)
+
+	# WHY IS THE ACCURACY OF A TYPE IN A FOLD ALWAYS THE SAME I.E. IN FOLD 1, TYPE 1 ACCURACY IS THE SAME REGARDLESS OF THE TRAINING FOLD --> CONFUSION MATRIX BUG?
+
+def analyzeResultsBasic(classifier, predictions, answerKey):
+	print "\nanalyzing results for {classifier} classifier using basic metric".format(classifier=classifier)
 
 	# make sure lengths are equal
 	if len(predictions) != len(answerKey):
 		print "error: discrepancy between number of prediction results and answey keys"
+		return
 
 	# initialize lists for each identifier for prediction results and answer key
 	type1ResultsCount = 0
@@ -237,6 +514,7 @@ def calculateTotalAccuracy(type1Results, type2Results, type3Results, type4Result
 
 	return total/posValues
 
+
 def calculateConfusionMatrix(predictions, answerKey, _type):
 	# compute the confusion matrix (true positive, false negative, false positive, true negative) for the given type
 	if len(predictions) != len(answerKey):
@@ -275,198 +553,46 @@ def calculateConfusionMatrix(predictions, answerKey, _type):
 	return confusionMatrix
 
 def calculateAccurary(tp, tn, fp, fn):
-	print "calculating accuracy = (#_true_positives + #_true_negatives) / (#_true_positives + #_false_positives + #_false_negatives + #_true_negatives)"
+	numerator = (tp + tn)
+	denominator = (tp + fp + fn + tn)
+	
+	if denominator > 0:
+		return numerator / denominator
 
-	accuracy = (tp + tn) / (tp + fp + fn + tn)
-
-	return accuracy
+	return 0.
 
 def calculateSensitivity(tp, fn):
-	print "calculating sensitivity = #_true_positives / (#_true_positives + #_false_negatives)"
+	numerator = tp
+	denominator = tp + fn
 
-	sensitivty = tp / (tp + fn)
+	if denominator > 0:
+		return numerator / denominator
 
-	return sensitivity
+	return 0.
 
 def calculateSpecificity(tn, fp):
-	print "calculating specificity = #_true_negatives / (#_true_negatives + #_false_positives)"
+	numerator = tn
+	denominator = tn + fp
 
-	specificity = tn / (tn + fp)
+	if denominator > 0:
+		return numerator / denominator
 
-	return specificity
+	return 0.
 
 def calculateMCC(tp, tn, fp, fn):
-	print "calculating MCC (Matthew's Correlation Coefficient) = ((#_true_positives * #_true_negatives) - (#_false_positives * #_false_negatives)) / sqroot((#_true_positives + #_false_positives)*(#_true_positives + #_false_negatives)*(#_true_negatives + #_false_positives)*(#_true_negatives + #_false_negatives))"
+	numerator = ((tp * tn) - (fp * fn))
+	denominator = math.sqrt((tp + fp)*(tp + fn)*(tn + fp)*(tn + fn))
 
-	MCC = ((tp * tn) - (fp * fn)) / math.sqrt((tp + fp)*(tp + fn)*(tn + fp)*(tn + fn))
+	if denominator > 0:
+		return numerator / denominator
 
-	return MCC
+	return 0.
 
 def calculateF1Score(tp, fp, fn):
-	print "calculating F1 Score = (2 * #_true_positives) / ((2 * #_true_positives) + #_false_positives + #_false_negatives)"
+	numerator = (2 * tp)
+	denominator = ((2 * tp) + fp + fn)
+	
+	if denominator > 0:
+		return numerator / denominator
 
-	F1Score = (2 * tp) / ((2 * tp) + fp + fn)
-
-	return F1Score
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ---------------------------------- BASIC METRIC ACCURACY FOR CROSS VALIDATION -------------------------------
-# def analyzeFoldResults(predictions, answerKey):
-# 	# make sure lengths are equal
-# 	if len(predictions) != len(answerKey):
-# 		print "error: discrepancy between number of prediction results and answey keys"
-
-# 	# initialize lists for each identifier for prediction results and answer key
-# 	type1ResultsCount = 0
-# 	type1KeyCounts = 0
-
-# 	type2ResultsCount = 0
-# 	type2KeyCounts = 0
-
-# 	type3ResultsCount = 0
-# 	type3KeyCounts = 0
-
-# 	type4ResultsCount = 0
-# 	type4KeyCounts = 0
-
-# 	type5ResultsCount = 0
-# 	type5KeyCounts = 0
-
-# 	type6ResultsCount = 0
-# 	type6KeyCounts = 0
-
-# 	type7ResultsCount = 0
-# 	type7KeyCounts = 0
-
-# 	type8ResultsCount = 0
-# 	type8KeyCounts = 0
-
-# 	type9ResultsCount = 0
-# 	type9KeyCounts = 0
-
-# 	# find the counts for each type in the predicion results
-# 	for _type in predictions:
-# 		if _type == 1:
-# 			type1ResultsCount += 1
-# 		elif _type == 2:
-# 			type2ResultsCount += 1
-# 		elif _type == 3:
-# 			type3ResultsCount += 1
-# 		elif _type == 4:
-# 			type4ResultsCount += 1
-# 		elif _type == 5:
-# 			type5ResultsCount += 1
-# 		elif _type == 6:
-# 			type6ResultsCount += 1
-# 		elif _type == 7:
-# 			type7ResultsCount += 1
-# 		elif _type == 8:
-# 			type8ResultsCount += 1
-# 		elif _type == 9:
-# 			type9ResultsCount += 1
-
-# 	# find the counts for each type in the answer key
-# 	for _type in answerKey:
-# 		if _type == 1:
-# 			type1KeyCounts += 1
-# 		elif _type == 2:
-# 			type2KeyCounts += 1
-# 		elif _type == 3:
-# 			type3KeyCounts += 1
-# 		elif _type == 4:
-# 			type4KeyCounts += 1
-# 		elif _type == 5:
-# 			type5KeyCounts += 1
-# 		elif _type == 6:
-# 			type6KeyCounts += 1
-# 		elif _type == 7:
-# 			type7KeyCounts += 1
-# 		elif _type == 8:
-# 			type8KeyCounts += 1
-# 		elif _type == 9:
-# 			type9KeyCounts += 1
-
-# 	# we need to establish a metric to penalize over classification i.e. classifying 9 cells as type 1 when only 8 cells are type 1
-# 	# we'll find the proportion of 1 cell/all cells of type and subtract this with each over classified cell
-# 	type1Proportion = calculateProportion(1, type1KeyCounts)
-# 	type2Proportion = calculateProportion(1, type2KeyCounts)
-# 	type3Proportion = calculateProportion(1, type3KeyCounts)
-# 	type4Proportion = calculateProportion(1, type4KeyCounts)
-# 	type5Proportion = calculateProportion(1, type5KeyCounts)
-# 	type6Proportion = calculateProportion(1, type6KeyCounts)
-# 	type7Proportion = calculateProportion(1, type7KeyCounts)
-# 	type8Proportion = calculateProportion(1, type8KeyCounts)
-# 	type9Proportion = calculateProportion(1, type9KeyCounts)
-
-# 	# check each result for over classification, and substract accordingly. else, set by proportion
-# 	type1Results = -1.
-# 	if type1ResultsCount > type1KeyCounts:
-# 		type1Results = 1.0 - (type1Proportion*(type1ResultsCount - type1KeyCounts))
-# 	else:
-# 		type1Results = calculateProportion(type1ResultsCount, type1KeyCounts)
-
-# 	type2Results = -1.
-# 	if type2ResultsCount > type2KeyCounts:
-# 		type2Results = 1.0 - (type2Proportion*(type2ResultsCount - type2KeyCounts))
-# 	else:
-# 		type2Results = calculateProportion(type2ResultsCount, type2KeyCounts)
-
-# 	type3Results = -1.
-# 	if type3ResultsCount > type3KeyCounts:
-# 		type3Results = 1.0 - (type3Proportion*(type3ResultsCount - type3KeyCounts))
-# 	else:
-# 		type3Results = calculateProportion(type3ResultsCount, type3KeyCounts)
-
-# 	type4Results = -1.
-# 	if type4ResultsCount > type4KeyCounts:
-# 		type4Results = 1.0 - (type4Proportion*(type4ResultsCount - type4KeyCounts))
-# 	else:
-# 		type4Results = calculateProportion(type4ResultsCount, type4KeyCounts)
-
-# 	type5Results = -1.
-# 	if type5ResultsCount > type5KeyCounts:
-# 		type5Results = 1.0 - (type5Proportion*(type5ResultsCount - type5KeyCounts))
-# 	else:
-# 		type5Results = calculateProportion(type5ResultsCount, type5KeyCounts)
-
-# 	type6Results = -1.
-# 	if type6ResultsCount > type6KeyCounts:
-# 		type6Results = 1.0 - (type6Proportion*(type6ResultsCount - type6KeyCounts))
-# 	else:
-# 		type6Results = calculateProportion(type6ResultsCount, type6KeyCounts)
-
-# 	type7Results = -1.
-# 	if type7ResultsCount > type7KeyCounts:
-# 		type7Results = 1.0 - (type7Proportion*(type7ResultsCount - type7KeyCounts))
-# 	else:
-# 		type7Results = calculateProportion(type7ResultsCount, type7KeyCounts)
-
-# 	type8Results = -1.
-# 	if type8ResultsCount > type8KeyCounts:
-# 		type8Results = 1.0 - (type8Proportion*(type8ResultsCount - type8KeyCounts))
-# 	else:
-# 		type8Results = calculateProportion(type8ResultsCount, type8KeyCounts)
-
-# 	type9Results = -1.
-# 	if type9ResultsCount > type9KeyCounts:
-# 		type9Results = 1.0 - (type9Proportion*(type9ResultsCount - type9KeyCounts))
-# 	else:
-# 		type9Results = calculateProportion(type9ResultsCount, type9KeyCounts)
-
-
-# 	# compute total prediction results
-# 	totalPredictionResults = calculateTotalAccuracy(type1Results, type2Results, type3Results, type4Results, type5Results,
-# 		type6Results, type7Results, type8Results, type9Results)
-
-# 	return totalPredictionResults
+	return 0.

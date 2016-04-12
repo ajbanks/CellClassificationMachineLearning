@@ -91,7 +91,7 @@ if __name__ == '__main__':
 
 			print "\nfitting training data and predicting testing data with gaussian naive bayes classifier"
 			iterator = 0 # we'll use this to iterate through folds and use each as the training data
-			accuracyResults = []
+			foldsEvaluations = []
 			while iterator < 10:
 				testingData = folds[iterator]
 				testingDataKey = foldsKey[iterator]
@@ -115,13 +115,16 @@ if __name__ == '__main__':
 				guassianNB_predictionResults = guassianNB_RNASeq.predictTestData(testingData)
 
 				# add the accuracies for this fold to accuracies list
-				accuracyResults.append(analysis.analyzeFoldResults(guassianNB_predictionResults, testingDataKey))
+				foldsEvaluations.append(analysis.calculateEvaluations(guassianNB_predictionResults, testingDataKey))
 
 				# increment iterator to process the next fold as testing data
 				iterator += 1
 
-			print "analyzing results..."
-			analysis.analyzeCrossValidationAccuracyResults(accuracyResults)
+			# analysis with basic metric
+			analysis.analyzeResultsBasic("Guassian Naive Bayes", guassianNB_predictionResults, testingDataKey)
+
+			# analysis with robust evaluations
+			analysis.analyzeResultsRobust(foldsEvaluations, 10)
 
 		else:
 			# partition the down sampled data set into 70% training and 30% testing
@@ -136,7 +139,12 @@ if __name__ == '__main__':
 			guassianNB_predictionResults = guassianNB_RNASeq.predictTestData(data.getDSTestingData())
 		
 			# analyze results of guassian nb on down sampled data
-			analysis.analyzeResults("Guassian Naive Bayes", guassianNB_predictionResults, data.getDSTestingDataTargetValues())
+			analysis.analyzeResultsBasic("Guassian Naive Bayes", guassianNB_predictionResults, data.getDSTestingDataTargetValues())
+
+			# analyze results using robust evaluations
+			foldsEvaluations = [] # single fold list but we still need to use a 3D list
+			foldsEvaluations.append(analysis.calculateEvaluations(guassianNB_predictionResults, data.getDSTestingDataTargetValues()))
+			analysis.analyzeResultsRobust(foldsEvaluations, 1)
 
 	else:
 		if crossValidateFlag:
@@ -154,7 +162,7 @@ if __name__ == '__main__':
 
 			print "\nfitting training data and predicting testing data with gaussian naive bayes classifier"
 			iterator = 0 # we'll use this to iterate through folds and use each as the training data
-			accuracyResults = []
+			foldsEvaluations = []
 			while iterator < 10:
 				testingData = folds[iterator]
 				testingDataKey = foldsKey[iterator]
@@ -178,15 +186,16 @@ if __name__ == '__main__':
 				guassianNB_predictionResults = guassianNB_RNASeq.predictTestData(testingData)
 
 				# add the accuracies for this fold to accuracies list
-				analysis.analyzeFoldResults(guassianNB_predictionResults, testingDataKey)
-				
-				# accuracyResults.append(val)
+				foldsEvaluations.append(analysis.calculateEvaluations(guassianNB_predictionResults, testingDataKey))
 
 				# increment iterator to process the next fold as testing data
 				iterator += 1
 
-			print "analyzing results..."
-			# analysis.analyzeCrossValidationAccuracyResults(accuracyResults)
+			# analysis with basic metric
+			analysis.analyzeResultsBasic("Guassian Naive Bayes", guassianNB_predictionResults, testingDataKey)
+
+			# analysis with robust evaluations
+			analysis.analyzeResultsRobust(foldsEvaluations, 10)
 
 		else:
 			# partition the data set into 70% training and 30% testing
@@ -198,8 +207,14 @@ if __name__ == '__main__':
 			# predict values using gaussian nb with down sampled data
 			guassianNB_predictionResults = guassianNB_RNASeq.predictTestData(data.getTestingData())
 		
-			# analyze results of guassian nb on down sampled data
-			analysis.analyzeResults("Guassian Naive Bayes", guassianNB_predictionResults, data.getTestingDataTargetValues())
+			# analyze results of guassian nb on down sampled data using basic metric
+			analysis.analyzeResultsBasic("Guassian Naive Bayes", guassianNB_predictionResults, data.getTestingDataTargetValues())
+
+			# analyze results using robust evaluations
+			foldsEvaluations = [] # single fold list but we still need to use a 3D list
+			foldsEvaluations.append(analysis.calculateEvaluations(guassianNB_predictionResults, data.getTestingDataTargetValues()))
+			analysis.analyzeResultsRobust(foldsEvaluations, 1)
+
 	
 
 	print "\nprogram execution: {t} seconds".format(t=time.clock()-t0)
