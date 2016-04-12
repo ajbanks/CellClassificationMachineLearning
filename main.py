@@ -152,6 +152,42 @@ if __name__ == '__main__':
 				print "error: folds and folds key are not parallel data sets"
 				sys.exit(0)
 
+			print "\nfitting training data and predicting testing data with gaussian naive bayes classifier"
+			iterator = 0 # we'll use this to iterate through folds and use each as the training data
+			accuracyResults = []
+			while iterator < 10:
+				testingData = folds[iterator]
+				testingDataKey = foldsKey[iterator]
+
+				# make 2D arrays of training cells and keys
+				trainingFolds = []
+				trainingKeys = []
+				i = 0
+				while i < 10:
+					if i != iterator:
+						for cell in folds[i]:
+							trainingFolds.append(cell)
+						for key in foldsKey[i]:
+							trainingKeys.append(key)
+					i += 1
+
+				# fit the 9 training folds using nb classifier
+				guassianNB_RNASeq.fitTrainingData(trainingFolds, trainingKeys)
+
+				# make predictions on the 1 testing fold using nb classifier
+				guassianNB_predictionResults = guassianNB_RNASeq.predictTestData(testingData)
+
+				# add the accuracies for this fold to accuracies list
+				analysis.analyzeFoldResults(guassianNB_predictionResults, testingDataKey)
+				
+				# accuracyResults.append(val)
+
+				# increment iterator to process the next fold as testing data
+				iterator += 1
+
+			print "analyzing results..."
+			# analysis.analyzeCrossValidationAccuracyResults(accuracyResults)
+
 		else:
 			# partition the data set into 70% training and 30% testing
 			data.makeTrainingAndTestingData()

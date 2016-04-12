@@ -525,8 +525,7 @@ class RNASeqData(object):
 			fold = []
 			foldKey = [] # a parallel list that holds the annotations for a single fold
 			iterator = 1
-			idx = 0
-			for cell in self.getRawData():
+			for idx in indices:
 				if iterator <= foldSize:
 					# add the cell to the fold
 					fold.append(self.getRawData()[idx])
@@ -536,7 +535,6 @@ class RNASeqData(object):
 
 					# increment iterator and idx
 					iterator += 1
-					idx += 1
 				else:
 					# add the fold to folds
 					folds.append(fold)
@@ -559,9 +557,6 @@ class RNASeqData(object):
 					# set iterator to 2
 					iterator = 2
 
-					# incremenet idx
-					idx += 1
-
 
 			# add any remaining cells and annotations to the first fold
 			for cell in fold:
@@ -577,8 +572,6 @@ class RNASeqData(object):
 			self.foldsKey = foldsKey
 
 			return
-
-
 
 	def getRawDataFileName(self):
 		return self.raw_data_file
