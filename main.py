@@ -149,10 +149,11 @@ if __name__ == '__main__':
 
 			# ***************** RBF SVC *****************
 			# analysis with basic metric
-			analysis.analyzeResultsBasic("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataKey)
+			analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataKey, foldsEvaluationsRBFSVC, 10)
+			# analysis.analyzeResultsBasic("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataKey)
 
-			# analysis with robust evaluations
-			analysis.analyzeResultsRobust(foldsEvaluationsRBFSVC, 10)
+			# # analysis with robust evaluations
+			# analysis.analyzeResultsRobust(foldsEvaluationsRBFSVC, 10)
 			# ***************** END RBF SVC *****************
 
 		else:
@@ -188,13 +189,15 @@ if __name__ == '__main__':
 			print "predicting test data on radial basis function support vector machine"
 			rbfSVC_predictionResults = rbfSVC_RNASeq.predictTestData(data.getDSTestingData())
 
-			# analyze results of rbf support vector machine with basic metric
-			analysis.analyzeResultsBasic("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, data.getDSTestingDataTargetValues())
+			# # analyze results of rbf support vector machine with basic metric
+			# analysis.analyzeResultsBasic("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, data.getDSTestingDataTargetValues())
 
 			# analyze results using robust evaluations
 			foldsEvaluationsRBFSVC = [] # single fold list but we still need to use a 3D list
 			foldsEvaluationsRBFSVC.append(analysis.calculateEvaluations(rbfSVC_predictionResults, data.getDSTestingDataTargetValues()))
-			analysis.analyzeResultsRobust(foldsEvaluationsRBFSVC, 1)
+			# analysis.analyzeResultsRobust(foldsEvaluationsRBFSVC, 1)
+
+			analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, data.getDSTestingDataTargetValues(), foldsEvaluationsRBFSVC, 1)
 			# ***************** END RBF SVC *****************
 
 
@@ -270,12 +273,15 @@ if __name__ == '__main__':
 
 
 			# ***************** RBF SVC *****************
-			# analysis with basic metric
-			print "** note: basic analysis only on final fold of cross validation"
-			analysis.analyzeResultsBasic("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataKey)
+			
+			analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataKey, foldsEvaluationsRBFSVC, 10)
 
-			# analysis with robust evaluations
-			analysis.analyzeResultsRobust(foldsEvaluationsRBFSVC, 10)
+			# # analysis with basic metric
+			# print "** note: basic analysis only on final fold of cross validation"
+			# analysis.analyzeResultsBasic("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataKey)
+
+			# # analysis with robust evaluations
+			# analysis.analyzeResultsRobust(foldsEvaluationsRBFSVC, 10)
 			# ***************** END RBF SVC *****************
 
 
@@ -313,12 +319,15 @@ if __name__ == '__main__':
 			rbfSVC_predictionResults = rbfSVC_RNASeq.predictTestData(data.getTestingData())
 
 			# analyze results of guassian nb on down sampled data using basic metric
-			analysis.analyzeResultsBasic("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, data.getTestingDataTargetValues())
+			# analysis.analyzeResultsBasic("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, data.getTestingDataTargetValues())
 
 			# analyze results using robust evaluations
 			foldsEvaluationsRBFSVC = [] # single fold list but we still need to use a 3D list
 			foldsEvaluationsRBFSVC.append(analysis.calculateEvaluations(rbfSVC_predictionResults, data.getTestingDataTargetValues()))
-			analysis.analyzeResultsRobust(foldsEvaluationsRBFSVC, 1)
+			# analysis.analyzeResultsRobust(foldsEvaluationsRBFSVC, 1)
+
+			analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, data.getTestingDataTargetValues(), foldsEvaluationsRBFSVC, 1)
+
 			# ***************** END RBF SVC *****************
 
 

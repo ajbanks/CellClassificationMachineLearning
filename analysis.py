@@ -1,7 +1,31 @@
 from __future__ import division
 import sys
+import os
+import time
 import math
 import numpy as np
+
+def analyzeAndWriteToFile(classifier, predictions, answerKey, foldsEvaluations, k):
+	dirName = "RNASeq_SingleCellClassification_Results"
+
+	# date and time
+	date = time.strftime("%m/%d/%Y")
+	t = time.strftime("%I:%M:%S")
+
+	# make file name
+	fileName = classifier + "_" + date + "_" + t
+
+	print fileName
+
+	print "\nAnalyzing results and writing to file"
+	
+	# check if there is a 'results' directory in the project root
+
+	print "** note: basic analysis only on final fold of cross validation"
+	analyzeResultsBasic(classifier, predictions, answerKey)
+	
+	analyzeResultsRobust(foldsEvaluations, k)
+	return
 
 # this will calculate and store a 2D list with evaluations for each type in the order [accuracy, sensitivity, specificity, MCC, F1]
 def calculateEvaluations(predictions, answerKey):
@@ -229,16 +253,16 @@ def analyzeResultsRobust(foldsEvaluations, k):
 	avgMcc = mccTotal/9
 	avgF1Score = f1ScoreTotal/9
 
-	print "Average accuracy per type: (BUG)"
-	print " - Type 1: {avgAccuracyType1}".format(avgAccuracyType1=avgAccuracyType1)
-	print " - Type 2: {avgAccuracyType2}".format(avgAccuracyType2=avgAccuracyType2)
-	print " - Type 3: {avgAccuracyType3}".format(avgAccuracyType3=avgAccuracyType3)
-	print " - Type 4: {avgAccuracyType4}".format(avgAccuracyType4=avgAccuracyType4)
-	print " - Type 5: {avgAccuracyType5}".format(avgAccuracyType5=avgAccuracyType5)
-	print " - Type 6: {avgAccuracyType6}".format(avgAccuracyType6=avgAccuracyType6)
-	print " - Type 7: {avgAccuracyType7}".format(avgAccuracyType7=avgAccuracyType7)
-	print " - Type 8: {avgAccuracyType8}".format(avgAccuracyType8=avgAccuracyType8)
-	print " - Type 9: {avgAccuracyType9}".format(avgAccuracyType9=avgAccuracyType9)
+	# print "Average accuracy per type: (BUG)"
+	# print " - Type 1: {avgAccuracyType1}".format(avgAccuracyType1=avgAccuracyType1)
+	# print " - Type 2: {avgAccuracyType2}".format(avgAccuracyType2=avgAccuracyType2)
+	# print " - Type 3: {avgAccuracyType3}".format(avgAccuracyType3=avgAccuracyType3)
+	# print " - Type 4: {avgAccuracyType4}".format(avgAccuracyType4=avgAccuracyType4)
+	# print " - Type 5: {avgAccuracyType5}".format(avgAccuracyType5=avgAccuracyType5)
+	# print " - Type 6: {avgAccuracyType6}".format(avgAccuracyType6=avgAccuracyType6)
+	# print " - Type 7: {avgAccuracyType7}".format(avgAccuracyType7=avgAccuracyType7)
+	# print " - Type 8: {avgAccuracyType8}".format(avgAccuracyType8=avgAccuracyType8)
+	# print " - Type 9: {avgAccuracyType9}".format(avgAccuracyType9=avgAccuracyType9)
 
 	print "\nAverage sensitivity per type: "
 	print " - Type 1: {avgSensitivityType1}".format(avgSensitivityType1=avgSensitivityType1)
