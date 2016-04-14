@@ -24,10 +24,27 @@ def calculateEvaluations(predictions, answerKey):
 	return foldEvaluations
 
 def calculateFoldEvaluations(confusionMatrix):
+
+	# Reference:
+	# confusionMatrix = [truePositives, falsePositives, falseNegatives, trueNegatives]
+	# tp = 0
+	# fp = 1
+	# fn = 2
+	# tn = 3
+
+	# calculateAccurary(tp, tn, fp, fn)
 	accuracy = calculateAccurary(confusionMatrix[0], confusionMatrix[3], confusionMatrix[1], confusionMatrix[2])
-	sensitivity = calculateSensitivity(confusionMatrix[0], confusionMatrix[1])
+
+	# calculateSensitivity(tp, fn)
+	sensitivity = calculateSensitivity(confusionMatrix[0], confusionMatrix[2])
+
+	# calculateSpecificity(tn, fp)
 	specificity = calculateSpecificity(confusionMatrix[3], confusionMatrix[1])
+
+	# calculateMCC(tp, tn, fp, fn)
 	mcc = calculateMCC(confusionMatrix[0], confusionMatrix[3], confusionMatrix[1], confusionMatrix[2])
+
+	# calculateF1Score(tp, fp, fn):
 	f1Score = calculateF1Score(confusionMatrix[0], confusionMatrix[1], confusionMatrix[2])
 
 	foldEvaluation = [accuracy, sensitivity, specificity, mcc, f1Score]
@@ -229,7 +246,7 @@ def analyzeResultsRobust(foldsEvaluations, k):
 	avgMcc = mccTotal/9
 	avgF1Score = f1ScoreTotal/9
 
-	print "Average accuracy per type: (BUG)"
+	print "Average accuracy per type:"
 	print " - Type 1: {avgAccuracyType1}".format(avgAccuracyType1=avgAccuracyType1)
 	print " - Type 2: {avgAccuracyType2}".format(avgAccuracyType2=avgAccuracyType2)
 	print " - Type 3: {avgAccuracyType3}".format(avgAccuracyType3=avgAccuracyType3)
