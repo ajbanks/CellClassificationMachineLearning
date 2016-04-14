@@ -5,27 +5,71 @@ import time
 import math
 import numpy as np
 
+# global string variables for writing to file
+tab = "	"
+newLine = "\n"
+types = ["Interneuron", "S1 Pyramidal", "CA1 Pyramidal", "Oligodendrocyte", "Microglia",
+"Endothelial", "Astrocyte", "Ependymal", "Mural"]
+GVs = "Global Evaluations"
+headerBar = " " + tab + "Accuracy" + tab + "Sensitivity" + tab + "Specificity" + tab + "MCC" + tab + "F1"
+
 def analyzeAndWriteToFile(classifier, predictions, answerKey, foldsEvaluations, k):
 	dirName = "RNASeq_SingleCellClassification_Results"
 
 	# date and time
-	date = time.strftime("%m/%d/%Y")
-	t = time.strftime("%I:%M:%S")
+	date = time.strftime("%m-%d-%Y")
+	t = time.strftime("%I-%M-%S")
 
 	# make file name
-	fileName = classifier + "_" + date + "_" + t
+	clf = ""
+	if classifier == "Radial Basis Function Support Vector Machine":
+		clf = "rbfsvc"
 
-	print fileName
 
-	print "\nAnalyzing results and writing to file"
+	fileName = clf + "_" + date + "_" + t + ".txt"
+
+	print "\nAnalyzing results and writing to file {fileName}".format(fileName=fileName)
 	
 	# check if there is a 'results' directory in the project root
+	if not os.path.exists(dirName):
+		os.makedirs(dirName) # create if not
+
+
+	# create the file in the newly created directory
+	file = open(dirName + "/" + fileName, "w+")
 
 	print "** note: basic analysis only on final fold of cross validation"
-	analyzeResultsBasic(classifier, predictions, answerKey)
+	accuracies = analyzeResultsBasic(classifier, predictions, answerKey)
 	
-	analyzeResultsRobust(foldsEvaluations, k)
+	sensitivities, specificities, mccs, f1Scores, globalVals = analyzeResultsRobust(foldsEvaluations, k)
+
+	# make sure the results lists are the correct size
+	if len(accuracies) != 9 and len(sensitivies) != 9 and len(specificities) != 9 and len(mccs) != 9 and len(f1Scores) != 9 and len(globalVals) != 5:
+		print "error: results list are incorrect size - cannot write to file"
+		file.close()
+		return
+
+	# write the header line to the file
+	file.write(headerBar)
+
+	# write the typed evaluations to the file
+	typeIterator = 0
+	while typeIterator < 9:
+		file.write(formatLine(types[typeIterator], accuracies[typeIterator], sensitivities[typeIterator],
+			specificities[typeIterator], mccs[typeIterator], f1Scores[typeIterator]))
+		typeIterator += 1
+
+	# write the global evaluations to the file
+	file.write(formatLine(GVs, globalVals[0], globalVals[1], globalVals[2], globalVals[3], globalVals[4]))
+
+	file.close()
 	return
+
+
+def formatLine(type, accuracy, sensitivity, specificity, mcc, f1score):
+	line = newLine + type + tab + str(accuracy) + tab + str(sensitivity) + tab + str(specificity) + tab + str(mcc) + tab + str(f1score)
+
+	return line
 
 # this will calculate and store a 2D list with evaluations for each type in the order [accuracy, sensitivity, specificity, MCC, F1]
 def calculateEvaluations(predictions, answerKey):
@@ -48,10 +92,27 @@ def calculateEvaluations(predictions, answerKey):
 	return foldEvaluations
 
 def calculateFoldEvaluations(confusionMatrix):
+
+	# Reference:
+	# confusionMatrix = [truePositives, falsePositives, falseNegatives, trueNegatives]
+	# tp = 0
+	# fp = 1
+	# fn = 2
+	# tn = 3
+
+	# calculateAccurary(tp, tn, fp, fn)
 	accuracy = calculateAccurary(confusionMatrix[0], confusionMatrix[3], confusionMatrix[1], confusionMatrix[2])
-	sensitivity = calculateSensitivity(confusionMatrix[0], confusionMatrix[1])
+
+	# calculateSensitivity(tp, fn)
+	sensitivity = calculateSensitivity(confusionMatrix[0], confusionMatrix[2])
+
+	# calculateSpecificity(tn, fp)
 	specificity = calculateSpecificity(confusionMatrix[3], confusionMatrix[1])
+
+	# calculateMCC(tp, tn, fp, fn)
 	mcc = calculateMCC(confusionMatrix[0], confusionMatrix[3], confusionMatrix[1], confusionMatrix[2])
+
+	# calculateF1Score(tp, fp, fn):
 	f1Score = calculateF1Score(confusionMatrix[0], confusionMatrix[1], confusionMatrix[2])
 
 	foldEvaluation = [accuracy, sensitivity, specificity, mcc, f1Score]
@@ -315,7 +376,22 @@ def analyzeResultsRobust(foldsEvaluations, k):
 	print " - MCC: {avgMcc}".format(avgMcc=avgMcc)
 	print " - F1 Score: {avgF1Score}".format(avgF1Score=avgF1Score)
 
-	# WHY IS THE ACCURACY OF A TYPE IN A FOLD ALWAYS THE SAME I.E. IN FOLD 1, TYPE 1 ACCURACY IS THE SAME REGARDLESS OF THE TRAINING FOLD --> CONFUSION MATRIX BUG?
+	# make lists of each category to return to calling method (for write to file)
+	sensitivities = [avgSensitivityType1, avgSensitivityType2, avgSensitivityType3, avgSensitivityType4, avgSensitivityType5, 
+	avgSensitivityType6, avgSensitivityType7, avgSensitivityType8, avgSensitivityType9]
+
+	specificities = [avgSpecificityType1, avgSpecificityType2, avgSpecificityType3, avgSpecificityType4, avgSpecificityType5, 
+	avgSpecificityType6, avgSpecificityType7, avgSpecificityType8, avgSpecificityType9]
+
+	mccs = [avgMccType1, avgMccType2, avgMccType3, avgMccType4, avgMccType5, avgMccType6, avgMccType7, avgMccType8, avgMccType9]
+
+	f1Scores = [avgF1ScoreType1, avgF1ScoreType2, avgF1ScoreType3, avgF1ScoreType4, avgF1ScoreType5, avgF1ScoreType6, 
+	avgF1ScoreType7, avgF1ScoreType8, avgF1ScoreType9]
+
+	globalVals = [avgAccuracy, avgSensitivity, avgSpecificity, avgMcc, avgF1Score]
+
+	return sensitivities, specificities, mccs, f1Scores, globalVals
+
 
 def analyzeResultsBasic(classifier, predictions, answerKey):
 	print "\nanalyzing results for {classifier} classifier using basic metric".format(classifier=classifier)
@@ -494,6 +570,11 @@ def analyzeResultsBasic(classifier, predictions, answerKey):
 	print "Type 9 accuracy (predictions: {type9ResultsCount}, known: {type9KeyCounts}) = {type9Results}".format(type9ResultsCount=type9ResultsCount, 
 		type9KeyCounts=type9KeyCounts, type9Results=type9Results)
 	print "Total accuracy (non_zero_prediction_results/num_non_zero_values) = {totalPredictionResults}".format(totalPredictionResults=totalPredictionResults)
+
+	# make list of basic accuracies
+	accuracies = [type1Results, type2Results, type3Results, type4Results, type5Results, type6Results, type7Results, type8Results, type9Results]
+
+	return accuracies
 
 def calculateProportion(n, total):
 	if total < 1:

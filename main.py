@@ -16,28 +16,78 @@ import analysis
 # run without downsampling and with cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 0 1
 # run without downsampling and without cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 0 0
 
+def gnb(trainingData, testingData, trainingDataTargets, testingDataTargets, crossValidateFlag):
+	# fit training data to gaussian nb
+	guassianNB_RNASeq.fitTrainingData(trainingData, trainingDataTargets)
+
+	# predict values using gaussian nb with down sampled data
+	guassianNB_predictionResults = guassianNB_RNASeq.predictTestData(testingData)
+		
+
+	if crossValidateFlag: # return the predictions for this fold
+		return guassianNB_predictionResults
+	else: # run analysis
+		# analyze results of guassian nb on down sampled data using basic metric
+		analysis.analyzeResultsBasic("Guassian Naive Bayes", guassianNB_predictionResults, testingDataTargets)
+
+		# analyze results using robust evaluations
+		foldsEvaluationsGNB = [] # single fold list but we still need to use a 3D list
+		foldsEvaluationsGNB.append(analysis.calculateEvaluations(guassianNB_predictionResults, testingDataTargets))
+		analysis.analyzeResultsRobust(foldsEvaluationsGNB, 1)
+
+
+def rbfSVC(trainingData, testingData, trainingDataTargets, testingDataTargets, crossValidateFlag):
+	# fit training data to rbf svc
+	rbfSVC_RNASeq.fitTrainingData(trainingData, trainingDataTargets)
+
+	# predict values using gaussian nb with down sampled data
+	rbfSVC_predictionResults = rbfSVC_RNASeq.predictTestData(testingData)
+
+
+
+	return rbfSVC_predictionResults
+	
+
+	# if crossValidateFlag: # return the predictions for this fold
+	# 	return rbfSVC_predictionResults
+	# else:# run analysis
+	# 	# analyze results of guassian nb on down sampled data using basic metric
+	# 	analysis.analyzeResultsBasic("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataTargets)
+
+	# 	# analyze results using robust evaluations
+	# 	foldsEvaluationsRBFSVC = [] # single fold list but we still need to use a 3D list
+	# 	foldsEvaluationsRBFSVC.append(analysis.calculateEvaluations(rbfSVC_predictionResults, testingDataTargets))
+	# 	analysis.analyzeResultsRobust(foldsEvaluationsRBFSVC, 1)
+
 if __name__ == '__main__':
 	t0 = time.clock()
 	print "start"
 	
 	# check for correct number of args
-	if len(sys.argv) != 5:
-		print "Usage: python main.py <raw_data_file> <annotations_file> <down sample? --> 0,1> <cross validate? --> 0,1>"
+	if len(sys.argv) != 6:
+		print "Usage: python main.py <raw_data_file> <annotations_file> <classifier [0,1,2,3,4] - gnb, svm, nn, rf, knn> <down sample? --> 0,1> <cross validate? --> 0,1>"
 		sys.exit(0)
 
 	raw_data_file = sys.argv[1]
 	annotations_file = sys.argv[2]
+	classifier = int(sys.argv[3])
 	downSampleFlag = False
 	crossValidateFlag = False
-	if sys.argv[3] == "1":
-		downSampleFlag = True
 	if sys.argv[4] == "1":
+		downSampleFlag = True
+	if sys.argv[5] == "1":
 		crossValidateFlag = True
 
 
 	print "Using:"
 	print " - raw data: {raw}".format(raw=raw_data_file)
 	print " - annotations: {ann}".format(ann=annotations_file)
+	
+	if classifier == 0:
+		print " - Using Guassian Naive Bayes Classifier"
+	elif classifier == 1:
+		print " - Using Radial Basis Function Kernel Support Vector Machine"
+	
 	if downSampleFlag:
 		print "** Down sampling enabled **"
 	else:
@@ -90,7 +140,6 @@ if __name__ == '__main__':
 				print "error: folds and folds key are not parallel data sets"
 				sys.exit(0)
 
-			print "\nfitting training data and predicting test data on GNBC and RBFSVC"
 			iterator = 0 # we'll use this to iterate through folds and use each as the training data
 			foldsEvaluationsGNB = []
 			foldsEvaluationsRBFSVC = []
@@ -110,95 +159,50 @@ if __name__ == '__main__':
 							trainingKeys.append(key)
 					i += 1
 
-				# ***************** GUASSIAN NB *****************
-				# fit the 9 training folds using nb classifier
-				guassianNB_RNASeq.fitTrainingData(trainingFolds, trainingKeys)
+				if classifier == 0:
+					x = 0
+				
+				elif classifier == 1:
+					# ***************** RBF SVC *****************
+					# fit and make predictions
+					rbfSVC_predictionResults = rbfSVC(trainingFolds, testingData, trainingKeys, testingDataKey, crossValidateFlag)
 
-				# make predictions on the 1 testing fold using nb classifier
-				guassianNB_predictionResults = guassianNB_RNASeq.predictTestData(testingData)
-
-				# add the accuracies for this fold to accuracies list
-				foldsEvaluationsGNB.append(analysis.calculateEvaluations(guassianNB_predictionResults, testingDataKey))
-				# ***************** END GUASSIAN NB *****************
-
-
-				# ***************** RBF SVC *****************
-				# fit the 9 training folds using rbf svc
-				rbfSVC_RNASeq.fitTrainingData(trainingFolds, trainingKeys)
-
-				# make predictions on the 1 testing fold using rbf svc
-				rbfSVC_predictionResults = rbfSVC_RNASeq.predictTestData(testingData)
-
-				# add the accuracies for this fold to accuracies list
-				foldsEvaluationsRBFSVC.append(analysis.calculateEvaluations(rbfSVC_predictionResults, testingDataKey))
-				# ***************** END RBF SVC *****************
+					# add the accuracies for this fold to accuracies list
+					foldsEvaluationsRBFSVC.append(analysis.calculateEvaluations(rbfSVC_predictionResults, testingDataKey))
+					# ***************** END RBF SVC *****************
 
 
 				# increment iterator to process the next fold as testing data
 				iterator += 1
 
-			# ***************** GUASSIAN NB *****************
-			# analysis with basic metric
-			print "** note: basic analysis only on final fold of cross validation"
-			analysis.analyzeResultsBasic("Guassian Naive Bayes", guassianNB_predictionResults, testingDataKey)
 
-			# analysis with robust evaluations
-			analysis.analyzeResultsRobust(foldsEvaluationsGNB, 10)
-			# ***************** END GUASSIAN NB *****************
+			if classifier == 0:
+				x = 0
 
-
-			# ***************** RBF SVC *****************
-			# analysis with basic metric
-			analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataKey, foldsEvaluationsRBFSVC, 10)
-			# analysis.analyzeResultsBasic("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataKey)
-
-			# # analysis with robust evaluations
-			# analysis.analyzeResultsRobust(foldsEvaluationsRBFSVC, 10)
-			# ***************** END RBF SVC *****************
+			elif classifier == 1:
+				# ***************** RBF SVC *****************
+				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataKey, foldsEvaluationsRBFSVC, 10)
+				# ***************** END RBF SVC *****************
 
 		else:
 			# partition the down sampled data set into 70% training and 30% testing
 			data.makeDSTrainingAndTestingData()
 
-			# ***************** GUASSIAN NB *****************
-			# fit down sampled training data to gaussian nb
-			print "\nfitting training data to gaussian naive bayes classifier"
-			guassianNB_RNASeq.fitTrainingData(data.getDSTrainingData(), data.getDSTargetValues())
+			if classifier == 0:
+				x = 0
 
-			# predict values using gaussian nb with down sampled data
-			print "predicting test data on gaussian naive bayes classifier"
-			guassianNB_predictionResults = guassianNB_RNASeq.predictTestData(data.getDSTestingData())
-		
-			# analyze results of guassian nb with basic metric
-			analysis.analyzeResultsBasic("Guassian Naive Bayes", guassianNB_predictionResults, data.getDSTestingDataTargetValues())
+			elif classifier == 1:
+				# ***************** RBF SVC *****************
+				rbfSVC_predictionResults = rbfSVC(data.getDSTrainingData(), data.getDSTestingData(), data.getDSTargetValues(),
+					data.getDSTestingDataTargetValues(), crossValidateFlag)
 
-			# analyze results using robust evaluations
-			foldsEvaluationsGNB = [] # single fold list but we still need to use a 3D list
-			foldsEvaluationsGNB.append(analysis.calculateEvaluations(guassianNB_predictionResults, data.getDSTestingDataTargetValues()))
-			analysis.analyzeResultsRobust(foldsEvaluationsGNB, 1)
-			# ***************** END GUASSIAN NB *****************
+				# analyze results using robust evaluations
+				foldsEvaluationsRBFSVC = [] # single fold list but we still need to use a 3D list
+				foldsEvaluationsRBFSVC.append(analysis.calculateEvaluations(rbfSVC_predictionResults, data.getDSTestingDataTargetValues()))
+				# analysis.analyzeResultsRobust(foldsEvaluationsRBFSVC, 1)
 
-
-
-			# ***************** RBF SVC *****************
-			# fit down sampled training data to radial basis function support vector machine
-			print "\n\nfitting training data to radial basis function support vector machine"
-			rbfSVC_RNASeq.fitTrainingData(data.getDSTrainingData(), data.getDSTargetValues())
-
-			# predict values using rbf support vector machine with down sampled data
-			print "predicting test data on radial basis function support vector machine"
-			rbfSVC_predictionResults = rbfSVC_RNASeq.predictTestData(data.getDSTestingData())
-
-			# # analyze results of rbf support vector machine with basic metric
-			# analysis.analyzeResultsBasic("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, data.getDSTestingDataTargetValues())
-
-			# analyze results using robust evaluations
-			foldsEvaluationsRBFSVC = [] # single fold list but we still need to use a 3D list
-			foldsEvaluationsRBFSVC.append(analysis.calculateEvaluations(rbfSVC_predictionResults, data.getDSTestingDataTargetValues()))
-			# analysis.analyzeResultsRobust(foldsEvaluationsRBFSVC, 1)
-
-			analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, data.getDSTestingDataTargetValues(), foldsEvaluationsRBFSVC, 1)
-			# ***************** END RBF SVC *****************
+				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, data.getDSTestingDataTargetValues(), foldsEvaluationsRBFSVC, 1)
+				# ***************** END RBF SVC *****************
 
 
 	else:
@@ -215,7 +219,6 @@ if __name__ == '__main__':
 				print "error: folds and folds key are not parallel data sets"
 				sys.exit(0)
 
-			print "\nfitting training data and predicting test data on GNBC and RBFSVC"
 			iterator = 0 # we'll use this to iterate through folds and use each as the training data
 			foldsEvaluationsGNB = []
 			foldsEvaluationsRBFSVC = []
@@ -235,104 +238,50 @@ if __name__ == '__main__':
 							trainingKeys.append(key)
 					i += 1
 
-				# ***************** GUASSIAN NB *****************
-				# fit the 9 training folds using nb classifier
-				guassianNB_RNASeq.fitTrainingData(trainingFolds, trainingKeys)
+				if classifier == 0:
+					x = 0
 
-				# make predictions on the 1 testing fold using nb classifier
-				guassianNB_predictionResults = guassianNB_RNASeq.predictTestData(testingData)
+				elif classifier == 1:
+					# ***************** RBF SVC *****************
+					# fit and make predictions
+					rbfSVC_predictionResults = rbfSVC(trainingFolds, testingData, trainingKeys, testingDataKey, crossValidateFlag)
 
-				# add the accuracies for this fold to accuracies list
-				foldsEvaluationsGNB.append(analysis.calculateEvaluations(guassianNB_predictionResults, testingDataKey))
-				# ***************** END GUASSIAN NB *****************
-
-
-				# ***************** RBF SVC *****************
-				# fit the 9 training folds using nb classifier
-				rbfSVC_RNASeq.fitTrainingData(trainingFolds, trainingKeys)
-
-				# make predictions on the 1 testing fold using nb classifier
-				rbfSVC_predictionResults = rbfSVC_RNASeq.predictTestData(testingData)
-
-				# add the accuracies for this fold to accuracies list
-				foldsEvaluationsRBFSVC.append(analysis.calculateEvaluations(rbfSVC_predictionResults, testingDataKey))
-				# ***************** END RBF SVC *****************
+					# add the accuracies for this fold to accuracies list
+					foldsEvaluationsRBFSVC.append(analysis.calculateEvaluations(rbfSVC_predictionResults, testingDataKey))
+					# ***************** END RBF SVC *****************
 
 				# increment iterator to process the next fold as testing data
 				iterator += 1
 
-			# ***************** GUASSIAN NB *****************
-			# analysis with basic metric
-			print "** note: basic analysis only on final fold of cross validation"
-			analysis.analyzeResultsBasic("Guassian Naive Bayes", guassianNB_predictionResults, testingDataKey)
 
-			# analysis with robust evaluations
-			analysis.analyzeResultsRobust(foldsEvaluations, 10)
-			# ***************** END GUASSIAN NB *****************
+			if classifier == 0:
+				x = 0
 
-
-
-			# ***************** RBF SVC *****************
-			
-			analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataKey, foldsEvaluationsRBFSVC, 10)
-
-			# # analysis with basic metric
-			# print "** note: basic analysis only on final fold of cross validation"
-			# analysis.analyzeResultsBasic("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataKey)
-
-			# # analysis with robust evaluations
-			# analysis.analyzeResultsRobust(foldsEvaluationsRBFSVC, 10)
-			# ***************** END RBF SVC *****************
-
+			elif classifier == 1:
+				# ***************** RBF SVC *****************
+				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataKey, foldsEvaluationsRBFSVC, 10)
+				# ***************** END RBF SVC *****************
 
 		else:
 			# partition the data set into 70% training and 30% testing
 			data.makeTrainingAndTestingData()
 
-			# ***************** GUASSIAN NB *****************
-			# fit training data to gaussian nb
-			print "\nfitting training data to guassian naive bayes classifier"
-			guassianNB_RNASeq.fitTrainingData(data.getTrainingData(), data.getTrainingDataTargetValues())
+			if classifier == 0:
+				x = 0
 
-			# predict values using gaussian nb with down sampled data
-			print "predicting test data on guassian naive bayes classifier"
-			guassianNB_predictionResults = guassianNB_RNASeq.predictTestData(data.getTestingData())
-		
-			# analyze results of guassian nb on down sampled data using basic metric
-			analysis.analyzeResultsBasic("Guassian Naive Bayes", guassianNB_predictionResults, data.getTestingDataTargetValues())
-
-			# analyze results using robust evaluations
-			foldsEvaluationsGNB = [] # single fold list but we still need to use a 3D list
-			foldsEvaluationsGNB.append(analysis.calculateEvaluations(guassianNB_predictionResults, data.getTestingDataTargetValues()))
-			analysis.analyzeResultsRobust(foldsEvaluationsGNB, 1)
-			# ***************** END GUASSIAN NB *****************
+			elif classifier == 1:
+				# ***************** RBF SVC *****************
+				rbfSVC_predictionResults = rbfSVC(data.getTrainingData(), data.getTestingData(), data.getTrainingDataTargetValues(),
+					data.getTestingDataTargetValues(), crossValidateFlag)
 
 
+				# analyze results using robust evaluations
+				foldsEvaluationsRBFSVC = [] # single fold list but we still need to use a 3D list
+				foldsEvaluationsRBFSVC.append(analysis.calculateEvaluations(rbfSVC_predictionResults, data.getTestingDataTargetValues()))
+				# analysis.analyzeResultsRobust(foldsEvaluationsRBFSVC, 1)
 
-			# ***************** RBF SVC *****************
-			# fit training data to gaussian nb
-			print "\nfitting training data to radial basis function support vector machine"
-			rbfSVC_RNASeq.fitTrainingData(data.getTrainingData(), data.getTrainingDataTargetValues())
-
-			# predict values using gaussian nb with down sampled data
-			print "predicting test data on radial basis function support vector machine"
-			rbfSVC_predictionResults = rbfSVC_RNASeq.predictTestData(data.getTestingData())
-
-			# analyze results of guassian nb on down sampled data using basic metric
-			# analysis.analyzeResultsBasic("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, data.getTestingDataTargetValues())
-
-			# analyze results using robust evaluations
-			foldsEvaluationsRBFSVC = [] # single fold list but we still need to use a 3D list
-			foldsEvaluationsRBFSVC.append(analysis.calculateEvaluations(rbfSVC_predictionResults, data.getTestingDataTargetValues()))
-			# analysis.analyzeResultsRobust(foldsEvaluationsRBFSVC, 1)
-
-			analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, data.getTestingDataTargetValues(), foldsEvaluationsRBFSVC, 1)
-
-			# ***************** END RBF SVC *****************
-
-
-
-	
+				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, data.getTestingDataTargetValues(), foldsEvaluationsRBFSVC, 1)
+				# ***************** END RBF SVC *****************
 
 	print "\nprogram execution: {t} seconds".format(t=time.clock()-t0)
 	print "exiting"

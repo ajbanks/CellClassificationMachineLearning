@@ -3,8 +3,6 @@ import random
 
 class RNASeqData(object):
 
-	# annotationsFileName = "";
-
 	def __init__(self, raw_data_file, annotations_file):
 		print "\ninitializing RNASeqData"
 		self.raw_data_file = raw_data_file
@@ -504,7 +502,7 @@ class RNASeqData(object):
 
 			# set the list of keys to a class wide variable
 			self.foldsKey = foldsKey
-
+			print "done"
 			return
 
 
@@ -571,6 +569,7 @@ class RNASeqData(object):
 			# set the list of keys to a class wide variable
 			self.foldsKey = foldsKey
 
+			print "done"
 			return
 
 	def getRawDataFileName(self):
