@@ -13,8 +13,17 @@ types = ["Interneuron", "S1 Pyramidal", "CA1 Pyramidal", "Oligodendrocyte", "Mic
 GVs = "Global Evaluations"
 headerBar = " " + tab + "Accuracy" + tab + "Sensitivity" + tab + "Specificity" + tab + "MCC" + tab + "F1"
 
-def analyzeAndWriteToFile(classifier, predictions, answerKey, foldsEvaluations, k):
-	dirName = "RNASeq_SingleCellClassification_Results"
+def analyzeAndWriteToFile(classifier, predictions, answerKey, foldsEvaluations, k, runOption):
+	topLevelDirName = "RNASeq_SingleCellClassification_Results"
+	
+	# directory names for each of the 4 combinations of down sampling and cross validation
+	DSAndCVDirName = "DS & CV"
+	DSAndNotCVDirName = "DS & !CV"
+	NotDSAndCVDirName = "!DS & CV"
+	NotDSAndNotCVDirName = "!DS & !CV"
+
+	
+
 
 	# date and time
 	date = time.strftime("%m-%d-%Y")
@@ -31,12 +40,39 @@ def analyzeAndWriteToFile(classifier, predictions, answerKey, foldsEvaluations, 
 	print "\nAnalyzing results and writing to file {fileName}".format(fileName=fileName)
 	
 	# check if there is a 'results' directory in the project root
-	if not os.path.exists(dirName):
-		os.makedirs(dirName) # create if not
+	if not os.path.exists(topLevelDirName):
+		os.makedirs(topLevelDirName) # create the results directory heirarchy if not
+		os.makedirs(topLevelDirName + "/" + DSAndCVDirName)
+		os.makedirs(topLevelDirName + "/" + DSAndNotCVDirName)
+		os.makedirs(topLevelDirName + "/" + NotDSAndCVDirName)
+		os.makedirs(topLevelDirName + "/" + NotDSAndNotCVDirName)
 
 
-	# create the file in the newly created directory
-	file = open(dirName + "/" + fileName, "w+")
+	# create the file in the newly created directory based on the run options selected
+	if runOption == 0:
+		if not os.path.exists(topLevelDirName + "/" + DSAndCVDirName):
+			os.makedirs(topLevelDirName + "/" + DSAndCVDirName)
+
+		file = open(topLevelDirName + "/" + DSAndCVDirName + "/" + fileName, "w+")
+
+	elif runOption == 1:
+		if not os.path.exists(topLevelDirName + "/" + DSAndNotCVDirName):
+			os.makedirs(topLevelDirName + "/" + DSAndNotCVDirName)
+
+		file = open(topLevelDirName + "/" + DSAndNotCVDirName + "/" + fileName, "w+")
+
+	elif runOption == 2:
+		if not os.path.exists(topLevelDirName + "/" + NotDSAndCVDirName):
+			os.makedirs(topLevelDirName + "/" + NotDSAndCVDirName)
+
+		file = open(topLevelDirName + "/" + NotDSAndCVDirName + "/" + fileName, "w+")
+
+	elif runOption == 3:
+		if not os.path.exists(topLevelDirName + "/" + NotDSAndNotCVDirName):
+			os.makedirs(topLevelDirName + "/" + NotDSAndNotCVDirName)
+
+		file = open(topLevelDirName + "/" + NotDSAndNotCVDirName + "/" + fileName, "w+")
+
 
 	print "** note: basic analysis only on final fold of cross validation"
 	accuracies = analyzeResultsBasic(classifier, predictions, answerKey)

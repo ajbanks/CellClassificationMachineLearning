@@ -11,10 +11,10 @@ import analysis
 # Resource: http://machinelearningmastery.com/get-your-hands-dirty-with-scikit-learn-now/
 # Python for Java Programmers: http://python4java.necaiseweb.org/Fundamentals/TheBasics
 
-# run with down sampling and cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 1 1
-# run with down sampling and without cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 1 0
-# run without downsampling and with cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 0 1
-# run without downsampling and without cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 0 0
+# run with down sampling and cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 1 1 1
+# run with down sampling and without cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 1 1 0
+# run without downsampling and with cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 1 0 1
+# run without downsampling and without cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 1 0 0
 
 def gnb(trainingData, testingData, trainingDataTargets, testingDataTargets, crossValidateFlag):
 	# fit training data to gaussian nb
@@ -181,7 +181,7 @@ if __name__ == '__main__':
 
 			elif classifier == 1:
 				# ***************** RBF SVC *****************
-				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataKey, foldsEvaluationsRBFSVC, 10)
+				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataKey, foldsEvaluationsRBFSVC, 10, 0)
 				# ***************** END RBF SVC *****************
 
 		else:
@@ -201,7 +201,7 @@ if __name__ == '__main__':
 				foldsEvaluationsRBFSVC.append(analysis.calculateEvaluations(rbfSVC_predictionResults, data.getDSTestingDataTargetValues()))
 				# analysis.analyzeResultsRobust(foldsEvaluationsRBFSVC, 1)
 
-				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, data.getDSTestingDataTargetValues(), foldsEvaluationsRBFSVC, 1)
+				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, data.getDSTestingDataTargetValues(), foldsEvaluationsRBFSVC, 1, 1)
 				# ***************** END RBF SVC *****************
 
 
@@ -259,7 +259,7 @@ if __name__ == '__main__':
 
 			elif classifier == 1:
 				# ***************** RBF SVC *****************
-				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataKey, foldsEvaluationsRBFSVC, 10)
+				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataKey, foldsEvaluationsRBFSVC, 10, 2)
 				# ***************** END RBF SVC *****************
 
 		else:
@@ -280,7 +280,7 @@ if __name__ == '__main__':
 				foldsEvaluationsRBFSVC.append(analysis.calculateEvaluations(rbfSVC_predictionResults, data.getTestingDataTargetValues()))
 				# analysis.analyzeResultsRobust(foldsEvaluationsRBFSVC, 1)
 
-				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, data.getTestingDataTargetValues(), foldsEvaluationsRBFSVC, 1)
+				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, data.getTestingDataTargetValues(), foldsEvaluationsRBFSVC, 1, 3)
 				# ***************** END RBF SVC *****************
 
 	print "\nprogram execution: {t} seconds".format(t=time.clock()-t0)
