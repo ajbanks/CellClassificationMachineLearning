@@ -2,18 +2,17 @@
 from sklearn.svm import SVC
 import numpy as np
 
+# PARAMETERS:
+	# decision function shape : 'ovo' one-vs-one, 'ovr' one-vs-rest, none
+# SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0, 
+# decision_function_shape=None, degree=3, gamma='auto', 
+# kernel='rbf', max_iter=-1, probability=False, random_state=None, 
+# shrinking=True, tol=0.001, verbose=False)
 
 rbfSVC = SVC(C=1.0, class_weight=None, coef0=0.0, 
 decision_function_shape=None, degree=3, gamma='auto', 
 kernel='rbf', max_iter=-1, probability=False, random_state=None, 
 shrinking=True, tol=0.001, verbose=False)
-
-# PARAMETERS:
-	# decision function shape : 'ovo' one-vs-one, 'ovr' one-vs-rest
-# SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0, 
-# decision_function_shape=None, degree=3, gamma='auto', 
-# kernel='rbf', max_iter=-1, probability=False, random_state=None, 
-# shrinking=True, tol=0.001, verbose=False)
 
 # Source: http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html#sklearn.svm.SVC
 def fitTrainingData(training_data, nSamples):
@@ -26,11 +25,6 @@ def fitTrainingData(training_data, nSamples):
 	nSamplesNP = np.array(nSamples)
 
 	rbfSVC.fit(training_dataNP, nSamplesNP)
-
-	# SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0,
- #    decision_function_shape=None, degree=3, gamma='auto', kernel='rbf',
- #    max_iter=-1, probability=False, random_state=None, shrinking=True,
- #    tol=0.001, verbose=False)
 
 def predictTestData(testing_data):
 	# make list into np array

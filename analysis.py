@@ -33,6 +33,8 @@ def analyzeAndWriteToFile(classifier, predictions, answerKey, foldsEvaluations, 
 	clf = ""
 	if classifier == "Radial Basis Function Support Vector Machine":
 		clf = "rbfsvc"
+	elif classifier == "Multi-Layer Perceptron (Neural Network)":
+		clf = "nn"
 
 
 	fileName = clf + "_" + date + "_" + t + ".txt"
