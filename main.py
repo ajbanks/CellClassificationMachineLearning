@@ -5,59 +5,44 @@ from RNASeqData import RNASeqData
 import preprocess
 import guassianNB_RNASeq
 import rbfSVC_RNASeq
+import neuralNetwork_RNASeq
 import analysis
 
 
 # Resource: http://machinelearningmastery.com/get-your-hands-dirty-with-scikit-learn-now/
 # Python for Java Programmers: http://python4java.necaiseweb.org/Fundamentals/TheBasics
 
-# run with down sampling and cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 1 1
-# run with down sampling and without cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 1 0
-# run without downsampling and with cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 0 1
-# run without downsampling and without cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 0 0
+# run with down sampling and cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 1 1 1
+# run with down sampling and without cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 1 1 0
+# run without downsampling and with cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 1 0 1
+# run without downsampling and without cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 1 0 0
 
-def gnb(trainingData, testingData, trainingDataTargets, testingDataTargets, crossValidateFlag):
+def gnb(trainingData, testingData, trainingDataTargets, testingDataTargets):
 	# fit training data to gaussian nb
 	guassianNB_RNASeq.fitTrainingData(trainingData, trainingDataTargets)
 
-	# predict values using gaussian nb with down sampled data
+	# predict values using gaussian nb
 	guassianNB_predictionResults = guassianNB_RNASeq.predictTestData(testingData)
 		
+	return guassianNB_predictionResults
 
-	if crossValidateFlag: # return the predictions for this fold
-		return guassianNB_predictionResults
-	else: # run analysis
-		# analyze results of guassian nb on down sampled data using basic metric
-		analysis.analyzeResultsBasic("Guassian Naive Bayes", guassianNB_predictionResults, testingDataTargets)
-
-		# analyze results using robust evaluations
-		foldsEvaluationsGNB = [] # single fold list but we still need to use a 3D list
-		foldsEvaluationsGNB.append(analysis.calculateEvaluations(guassianNB_predictionResults, testingDataTargets))
-		analysis.analyzeResultsRobust(foldsEvaluationsGNB, 1)
-
-
-def rbfSVC(trainingData, testingData, trainingDataTargets, testingDataTargets, crossValidateFlag):
+def rbfSVC(trainingData, testingData, trainingDataTargets, testingDataTargets):
 	# fit training data to rbf svc
 	rbfSVC_RNASeq.fitTrainingData(trainingData, trainingDataTargets)
 
-	# predict values using gaussian nb with down sampled data
+	# predict values using rbf support vector machine
 	rbfSVC_predictionResults = rbfSVC_RNASeq.predictTestData(testingData)
 
-
-
 	return rbfSVC_predictionResults
+
+def mlp(trainingData, testingData, trainingDataTargets, testingDataTargets):
+	# fit training data to multi layer perceptron
+	neuralNetwork_RNASeq.fitTrainingData(trainingData, trainingDataTargets)
+
+	# predict values using neural network
+	neuralNetwork_predictionResults = neuralNetwork_RNASeq.predictTestData(testingData)
 	
-
-	# if crossValidateFlag: # return the predictions for this fold
-	# 	return rbfSVC_predictionResults
-	# else:# run analysis
-	# 	# analyze results of guassian nb on down sampled data using basic metric
-	# 	analysis.analyzeResultsBasic("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataTargets)
-
-	# 	# analyze results using robust evaluations
-	# 	foldsEvaluationsRBFSVC = [] # single fold list but we still need to use a 3D list
-	# 	foldsEvaluationsRBFSVC.append(analysis.calculateEvaluations(rbfSVC_predictionResults, testingDataTargets))
-	# 	analysis.analyzeResultsRobust(foldsEvaluationsRBFSVC, 1)
+	return neuralNetwork_predictionResults
 
 if __name__ == '__main__':
 	t0 = time.clock()
@@ -87,6 +72,8 @@ if __name__ == '__main__':
 		print " - Using Guassian Naive Bayes Classifier"
 	elif classifier == 1:
 		print " - Using Radial Basis Function Kernel Support Vector Machine"
+	elif classifier == 2:
+		print " - Using Multi-Layer Perceptron (Neural Network)"
 	
 	if downSampleFlag:
 		print "** Down sampling enabled **"
@@ -141,8 +128,7 @@ if __name__ == '__main__':
 				sys.exit(0)
 
 			iterator = 0 # we'll use this to iterate through folds and use each as the training data
-			foldsEvaluationsGNB = []
-			foldsEvaluationsRBFSVC = []
+			foldsEvaluations = []
 			while iterator < 10:
 				testingData = folds[iterator]
 				testingDataKey = foldsKey[iterator]
@@ -165,15 +151,25 @@ if __name__ == '__main__':
 				elif classifier == 1:
 					# ***************** RBF SVC *****************
 					# fit and make predictions
-					rbfSVC_predictionResults = rbfSVC(trainingFolds, testingData, trainingKeys, testingDataKey, crossValidateFlag)
+					rbfSVC_predictionResults = rbfSVC(trainingFolds, testingData, trainingKeys, testingDataKey)
 
 					# add the accuracies for this fold to accuracies list
-					foldsEvaluationsRBFSVC.append(analysis.calculateEvaluations(rbfSVC_predictionResults, testingDataKey))
+					foldsEvaluations.append(analysis.calculateEvaluations(rbfSVC_predictionResults, testingDataKey))
 					# ***************** END RBF SVC *****************
+
+				elif classifier == 2:
+					# ***************** MLP *****************
+					# fit and make predictions
+					neuralNetwork_predictionResults = mlp(trainingFolds, testingData, trainingKeys, testingDataKey)
+
+					# add the accuracies for this fold to accuracies list
+					foldsEvaluations.append(analysis.calculateEvaluations(neuralNetwork_predictionResults, testingDataKey))
+					# ***************** END MLP *****************
 
 
 				# increment iterator to process the next fold as testing data
 				iterator += 1
+				print "finished fold #{num}".format(num=iterator)
 
 
 			if classifier == 0:
@@ -181,8 +177,12 @@ if __name__ == '__main__':
 
 			elif classifier == 1:
 				# ***************** RBF SVC *****************
-				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataKey, foldsEvaluationsRBFSVC, 10)
+				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataKey, foldsEvaluations, 10, 0)
 				# ***************** END RBF SVC *****************
+			elif classifier == 2:
+				# ***************** MLP *****************
+				analysis.analyzeAndWriteToFile("Multi-Layer Perceptron (Neural Network)", neuralNetwork_predictionResults, testingDataKey, foldsEvaluations, 10, 0)
+				# ***************** END MLP *****************
 
 		else:
 			# partition the down sampled data set into 70% training and 30% testing
@@ -194,15 +194,25 @@ if __name__ == '__main__':
 			elif classifier == 1:
 				# ***************** RBF SVC *****************
 				rbfSVC_predictionResults = rbfSVC(data.getDSTrainingData(), data.getDSTestingData(), data.getDSTargetValues(),
-					data.getDSTestingDataTargetValues(), crossValidateFlag)
+					data.getDSTestingDataTargetValues())
 
 				# analyze results using robust evaluations
-				foldsEvaluationsRBFSVC = [] # single fold list but we still need to use a 3D list
-				foldsEvaluationsRBFSVC.append(analysis.calculateEvaluations(rbfSVC_predictionResults, data.getDSTestingDataTargetValues()))
-				# analysis.analyzeResultsRobust(foldsEvaluationsRBFSVC, 1)
+				foldsEvaluations = [] # single fold list but we still need to use a 3D list
+				foldsEvaluations.append(analysis.calculateEvaluations(rbfSVC_predictionResults, data.getDSTestingDataTargetValues()))
 
-				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, data.getDSTestingDataTargetValues(), foldsEvaluationsRBFSVC, 1)
+				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, data.getDSTestingDataTargetValues(), foldsEvaluations, 1, 1)
 				# ***************** END RBF SVC *****************
+			elif classifier == 2:
+				# ***************** MLP *****************
+				neuralNetwork_predictionResults = mlp(data.getDSTrainingData(), data.getDSTestingData(), data.getDSTargetValues(),
+					data.getDSTestingDataTargetValues())
+
+				# analyze results using robust evaluations
+				foldsEvaluations = [] # single fold list but we still need to use a 3D list
+				foldsEvaluations.append(analysis.calculateEvaluations(neuralNetwork_predictionResults, data.getDSTestingDataTargetValues()))
+
+				analysis.analyzeAndWriteToFile("Multi-Layer Perceptron (Neural Network)", neuralNetwork_predictionResults, data.getDSTestingDataTargetValues(), foldsEvaluations, 1, 1)
+				# ***************** END MLP *****************
 
 
 	else:
@@ -220,8 +230,7 @@ if __name__ == '__main__':
 				sys.exit(0)
 
 			iterator = 0 # we'll use this to iterate through folds and use each as the training data
-			foldsEvaluationsGNB = []
-			foldsEvaluationsRBFSVC = []
+			foldsEvaluations = []
 			while iterator < 10:
 				testingData = folds[iterator]
 				testingDataKey = foldsKey[iterator]
@@ -244,14 +253,23 @@ if __name__ == '__main__':
 				elif classifier == 1:
 					# ***************** RBF SVC *****************
 					# fit and make predictions
-					rbfSVC_predictionResults = rbfSVC(trainingFolds, testingData, trainingKeys, testingDataKey, crossValidateFlag)
+					rbfSVC_predictionResults = rbfSVC(trainingFolds, testingData, trainingKeys, testingDataKey)
 
 					# add the accuracies for this fold to accuracies list
-					foldsEvaluationsRBFSVC.append(analysis.calculateEvaluations(rbfSVC_predictionResults, testingDataKey))
+					foldsEvaluations.append(analysis.calculateEvaluations(rbfSVC_predictionResults, testingDataKey))
 					# ***************** END RBF SVC *****************
+				elif classifier == 2:
+					# ***************** MLP *****************
+					# fit and make predictions
+					neuralNetwork_predictionResults = mlp(trainingFolds, testingData, trainingKeys, testingDataKey)
+
+					# add the accuracies for this fold to accuracies list
+					foldsEvaluations.append(analysis.calculateEvaluations(neuralNetwork_predictionResults, testingDataKey))
+					# ***************** END MLP *****************
 
 				# increment iterator to process the next fold as testing data
 				iterator += 1
+				print "finished fold #{num}".format(num=iterator)
 
 
 			if classifier == 0:
@@ -259,8 +277,12 @@ if __name__ == '__main__':
 
 			elif classifier == 1:
 				# ***************** RBF SVC *****************
-				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataKey, foldsEvaluationsRBFSVC, 10)
+				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataKey, foldsEvaluations, 10, 2)
 				# ***************** END RBF SVC *****************
+			elif classifier == 2:
+				# ***************** MLP *****************
+				analysis.analyzeAndWriteToFile("Multi-Layer Perceptron (Neural Network)", neuralNetwork_predictionResults, testingDataKey, foldsEvaluations, 10, 2)
+				# ***************** END MLP *****************
 
 		else:
 			# partition the data set into 70% training and 30% testing
@@ -272,16 +294,27 @@ if __name__ == '__main__':
 			elif classifier == 1:
 				# ***************** RBF SVC *****************
 				rbfSVC_predictionResults = rbfSVC(data.getTrainingData(), data.getTestingData(), data.getTrainingDataTargetValues(),
-					data.getTestingDataTargetValues(), crossValidateFlag)
+					data.getTestingDataTargetValues())
 
 
 				# analyze results using robust evaluations
-				foldsEvaluationsRBFSVC = [] # single fold list but we still need to use a 3D list
-				foldsEvaluationsRBFSVC.append(analysis.calculateEvaluations(rbfSVC_predictionResults, data.getTestingDataTargetValues()))
-				# analysis.analyzeResultsRobust(foldsEvaluationsRBFSVC, 1)
+				foldsEvaluations = [] # single fold list but we still need to use a 3D list
+				foldsEvaluations.append(analysis.calculateEvaluations(rbfSVC_predictionResults, data.getTestingDataTargetValues()))
 
-				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, data.getTestingDataTargetValues(), foldsEvaluationsRBFSVC, 1)
+				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, data.getTestingDataTargetValues(), foldsEvaluations, 1, 3)
 				# ***************** END RBF SVC *****************
+			elif classifier == 2:
+				# ***************** MLP *****************
+				neuralNetwork_predictionResults = mlp(data.getTrainingData(), data.getTestingData(), data.getTrainingDataTargetValues(),
+					data.getTestingDataTargetValues())
+
+
+				# analyze results using robust evaluations
+				foldsEvaluations = [] # single fold list but we still need to use a 3D list
+				foldsEvaluations.append(analysis.calculateEvaluations(neuralNetwork_predictionResults, data.getTestingDataTargetValues()))
+
+				analysis.analyzeAndWriteToFile("Multi-Layer Perceptron (Neural Network)", neuralNetwork_predictionResults, data.getTestingDataTargetValues(), foldsEvaluations, 1, 3)
+				# ***************** END MLP *****************
 
 	print "\nprogram execution: {t} seconds".format(t=time.clock()-t0)
 	print "exiting"
