@@ -22,9 +22,6 @@ def analyzeAndWriteToFile(classifier, predictions, answerKey, foldsEvaluations, 
 	NotDSAndCVDirName = "!DS & CV"
 	NotDSAndNotCVDirName = "!DS & !CV"
 
-	
-
-
 	# date and time
 	date = time.strftime("%m-%d-%Y")
 	t = time.strftime("%I-%M-%S")
@@ -35,6 +32,9 @@ def analyzeAndWriteToFile(classifier, predictions, answerKey, foldsEvaluations, 
 		clf = "rbfsvc"
 	elif classifier == "Multi-Layer Perceptron (Neural Network)":
 		clf = "nn"
+	elif classifier.startswith("KNearestNeighbor Classifier_"):
+		idx = classifier.index("_")
+		clf = "{k}knn".format(k=classifier[idx+1:])
 
 
 	fileName = clf + "_" + date + "_" + t + ".txt"

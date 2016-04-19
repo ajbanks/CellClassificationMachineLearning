@@ -6,6 +6,7 @@ import preprocess
 import guassianNB_RNASeq
 import rbfSVC_RNASeq
 import neuralNetwork_RNASeq
+import knn_RNASeq
 import analysis
 
 
@@ -44,13 +45,26 @@ def mlp(trainingData, testingData, trainingDataTargets, testingDataTargets):
 	
 	return neuralNetwork_predictionResults
 
+def knn(trainingData, testingData, trainingDataTargets, testingDataTargets):
+	# fit training data to knn
+	knn_RNASeq.fitTrainingData(trainingData, trainingDataTargets)
+
+	# predict the values using knn classifier
+	knn_predictionResults = knn_RNASeq.predictTestData(testingData)
+
+	return knn_predictionResults
+
 if __name__ == '__main__':
 	t0 = time.clock()
 	print "start"
 	
 	# check for correct number of args
-	if len(sys.argv) != 6:
-		print "Usage: python main.py <raw_data_file> <annotations_file> <classifier [0,1,2,3,4] - gnb, svm, nn, rf, knn> <down sample? --> 0,1> <cross validate? --> 0,1>"
+	if int(sys.argv[3]) == 3 and len(sys.argv) != 7:
+		print "Usage: python main.py <raw_data_file> <annotations_file> <classifier [0,1,2,3,4] - gnb, svm, nn, knn, rf> <down sample? --> 0,1> <cross validate? --> 0,1> <n_neighbors (only if knn)>"
+		sys.exit(0)
+	
+	if int(sys.argv[3]) != 3 and len(sys.argv) != 6:
+		print "Usage: python main.py <raw_data_file> <annotations_file> <classifier [0,1,2,3,4] - gnb, svm, nn, knn, rf> <down sample? --> 0,1> <cross validate? --> 0,1> <n_neighbors (only if knn)>"
 		sys.exit(0)
 
 	raw_data_file = sys.argv[1]
@@ -63,6 +77,12 @@ if __name__ == '__main__':
 	if sys.argv[5] == "1":
 		crossValidateFlag = True
 
+	n_neighbors = -1
+	if classifier == 3: # using knn, need to supply param for number of neighbors
+		n_neighbors = int(sys.argv[6])
+		knn_RNASeq.initializeKnn(n_neighbors) # initialize the classifier with n_neighbors
+
+
 
 	print "Using:"
 	print " - raw data: {raw}".format(raw=raw_data_file)
@@ -74,6 +94,8 @@ if __name__ == '__main__':
 		print " - Using Radial Basis Function Kernel Support Vector Machine"
 	elif classifier == 2:
 		print " - Using Multi-Layer Perceptron (Neural Network)"
+	elif classifier == 3:
+		print " - Using K Nearest Neighbor Classifier with k = {k}".format(k=n_neighbors)
 	
 	if downSampleFlag:
 		print "** Down sampling enabled **"
@@ -166,6 +188,15 @@ if __name__ == '__main__':
 					foldsEvaluations.append(analysis.calculateEvaluations(neuralNetwork_predictionResults, testingDataKey))
 					# ***************** END MLP *****************
 
+				elif classifier == 3:
+					# ***************** KNN *****************
+					# fit and make predictions
+					knn_predictionResults = knn(trainingFolds, testingData, trainingKeys, testingDataKey)
+
+					# add the accuracies for this fold to the accuracies list
+					foldsEvaluations.append(analysis.calculateEvaluations(knn_predictionResults, testingDataKey))
+					# ***************** END KNN *****************
+
 
 				# increment iterator to process the next fold as testing data
 				iterator += 1
@@ -183,6 +214,10 @@ if __name__ == '__main__':
 				# ***************** MLP *****************
 				analysis.analyzeAndWriteToFile("Multi-Layer Perceptron (Neural Network)", neuralNetwork_predictionResults, testingDataKey, foldsEvaluations, 10, 0)
 				# ***************** END MLP *****************
+			elif classifier == 3:
+				# ***************** KNN *****************
+				analysis.analyzeAndWriteToFile("KNearestNeighbor Classifier_{k}".format(k=n_neighbors), knn_predictionResults, testingDataKey, foldsEvaluations, 10, 0)
+				# ***************** END KNN *****************
 
 		else:
 			# partition the down sampled data set into 70% training and 30% testing
@@ -213,6 +248,16 @@ if __name__ == '__main__':
 
 				analysis.analyzeAndWriteToFile("Multi-Layer Perceptron (Neural Network)", neuralNetwork_predictionResults, data.getDSTestingDataTargetValues(), foldsEvaluations, 1, 1)
 				# ***************** END MLP *****************
+			elif classifier == 3:
+				# ***************** KNN *****************
+				knn_predictionResults = knn(data.getDSTrainingData(), data.getDSTestingData(), data.getDSTargetValues(),
+					data.getDSTestingDataTargetValues())
+
+				foldsEvaluations = [] # single fold list but we still need to use a 3D list
+				foldsEvaluations.append(analysis.calculateEvaluations(knn_predictionResults, data.getDSTestingDataTargetValues()))
+
+				analysis.analyzeAndWriteToFile("KNearestNeighbor Classifier_{k}".format(k=n_neighbors), knn_predictionResults, data.getDSTestingDataTargetValues(), foldsEvaluations, 1, 1)
+				# ***************** END KNN *****************
 
 
 	else:
@@ -266,6 +311,15 @@ if __name__ == '__main__':
 					# add the accuracies for this fold to accuracies list
 					foldsEvaluations.append(analysis.calculateEvaluations(neuralNetwork_predictionResults, testingDataKey))
 					# ***************** END MLP *****************
+				elif classifier == 3:
+					# ***************** KNN *****************
+					# fit and make predictions
+					knn_predictionResults = knn(trainingFolds, testingData, trainingKeys, testingDataKey)
+
+					# add the accuracies for this fold to accuracies list
+					foldsEvaluations.append(analysis.calculateEvaluations(knn_predictionResults, testingDataKey))
+					# ***************** END KNN *****************
+
 
 				# increment iterator to process the next fold as testing data
 				iterator += 1
@@ -283,6 +337,10 @@ if __name__ == '__main__':
 				# ***************** MLP *****************
 				analysis.analyzeAndWriteToFile("Multi-Layer Perceptron (Neural Network)", neuralNetwork_predictionResults, testingDataKey, foldsEvaluations, 10, 2)
 				# ***************** END MLP *****************
+			elif classifier == 3:
+				# ***************** KNN *****************
+				analysis.analyzeAndWriteToFile("KNearestNeighbor Classifier_{k}".format(k=n_neighbors), knn_predictionResults, testingDataKey, foldsEvaluations, 10, 2)
+				# ***************** END KNN *****************
 
 		else:
 			# partition the data set into 70% training and 30% testing
@@ -296,18 +354,17 @@ if __name__ == '__main__':
 				rbfSVC_predictionResults = rbfSVC(data.getTrainingData(), data.getTestingData(), data.getTrainingDataTargetValues(),
 					data.getTestingDataTargetValues())
 
-
 				# analyze results using robust evaluations
 				foldsEvaluations = [] # single fold list but we still need to use a 3D list
 				foldsEvaluations.append(analysis.calculateEvaluations(rbfSVC_predictionResults, data.getTestingDataTargetValues()))
 
 				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, data.getTestingDataTargetValues(), foldsEvaluations, 1, 3)
 				# ***************** END RBF SVC *****************
+			
 			elif classifier == 2:
 				# ***************** MLP *****************
 				neuralNetwork_predictionResults = mlp(data.getTrainingData(), data.getTestingData(), data.getTrainingDataTargetValues(),
 					data.getTestingDataTargetValues())
-
 
 				# analyze results using robust evaluations
 				foldsEvaluations = [] # single fold list but we still need to use a 3D list
@@ -315,6 +372,19 @@ if __name__ == '__main__':
 
 				analysis.analyzeAndWriteToFile("Multi-Layer Perceptron (Neural Network)", neuralNetwork_predictionResults, data.getTestingDataTargetValues(), foldsEvaluations, 1, 3)
 				# ***************** END MLP *****************
+
+			elif classifier == 3:
+				# ***************** KNN *****************
+				knn_predictionResults = knn(data.getTrainingData(), data.getTestingData(), data.getTrainingDataTargetValues(),
+					data.getTestingDataTargetValues())
+
+				# analyze results using robust evaluations
+				foldsEvaluations = []
+
+				foldsEvaluations.append(analysis.calculateEvaluations(knn_predictionResults, data.getTestingDataTargetValues()))
+
+				analysis.analyzeAndWriteToFile("KNearestNeighbor Classifier_{k}".format(k=n_neighbors), knn_predictionResults, data.getTestingDataTargetValues(), foldsEvaluations, 1, 3)
+				# ***************** END KNN *****************
 
 	print "\nprogram execution: {t} seconds".format(t=time.clock()-t0)
 	print "exiting"
