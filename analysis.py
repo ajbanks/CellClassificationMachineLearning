@@ -35,6 +35,8 @@ def analyzeAndWriteToFile(classifier, predictions, answerKey, foldsEvaluations, 
 	elif classifier.startswith("KNearestNeighbor Classifier_"):
 		idx = classifier.index("_")
 		clf = "{k}knn".format(k=classifier[idx+1:])
+	elif classifier == "Random Forest Classifier":
+		clf = "rf"
 
 
 	fileName = clf + "_" + date + "_" + t + ".txt"

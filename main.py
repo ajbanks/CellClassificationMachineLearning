@@ -7,11 +7,8 @@ import guassianNB_RNASeq
 import rbfSVC_RNASeq
 import neuralNetwork_RNASeq
 import knn_RNASeq
+import randomForest_RNASeq
 import analysis
-
-
-# Resource: http://machinelearningmastery.com/get-your-hands-dirty-with-scikit-learn-now/
-# Python for Java Programmers: http://python4java.necaiseweb.org/Fundamentals/TheBasics
 
 # run with down sampling and cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 1 1 1
 # run with down sampling and without cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 1 1 0
@@ -53,6 +50,15 @@ def knn(trainingData, testingData, trainingDataTargets, testingDataTargets):
 	knn_predictionResults = knn_RNASeq.predictTestData(testingData)
 
 	return knn_predictionResults
+
+def rf(trainingData, testingData, trainingDataTargets, testingDataTargets):
+	# fit training data to rf
+	randomForest_RNASeq.fitTrainingData(trainingData, trainingDataTargets)
+
+	# predict the values using random forest classifier
+	rf_predictionResults =  randomForest_RNASeq.predictTestData(testingData)
+
+	return rf_predictionResults
 
 if __name__ == '__main__':
 	t0 = time.clock()
@@ -96,6 +102,11 @@ if __name__ == '__main__':
 		print " - Using Multi-Layer Perceptron (Neural Network)"
 	elif classifier == 3:
 		print " - Using K Nearest Neighbor Classifier with k = {k}".format(k=n_neighbors)
+	elif classifier == 4:
+		print " - Using Random Forest Classifier"
+	else:
+		print "** ERROR: invalid classifier selection"
+		sys.exit(0)
 	
 	if downSampleFlag:
 		print "** Down sampling enabled **"
@@ -197,6 +208,15 @@ if __name__ == '__main__':
 					foldsEvaluations.append(analysis.calculateEvaluations(knn_predictionResults, testingDataKey))
 					# ***************** END KNN *****************
 
+				elif classifier == 4:
+					# ***************** RF *****************
+					# fit and make predictions
+					rf_predictionResults = rf(trainingFolds, testingData, trainingKeys, testingDataKey)
+
+					# add the accuracies for this fold to the accuracies list
+					foldsEvaluations.append(analysis.calculateEvaluations(rf_predictionResults, testingDataKey))
+					# ***************** END RF *****************
+
 
 				# increment iterator to process the next fold as testing data
 				iterator += 1
@@ -218,6 +238,10 @@ if __name__ == '__main__':
 				# ***************** KNN *****************
 				analysis.analyzeAndWriteToFile("KNearestNeighbor Classifier_{k}".format(k=n_neighbors), knn_predictionResults, testingDataKey, foldsEvaluations, 10, 0)
 				# ***************** END KNN *****************
+			elif classifier == 4:
+				# ***************** RF *****************
+				analysis.analyzeAndWriteToFile("Random Forest Classifier", rf_predictionResults, testingDataKey, foldsEvaluations, 10, 0)
+				# ***************** END RF *****************
 
 		else:
 			# partition the down sampled data set into 70% training and 30% testing
@@ -258,7 +282,16 @@ if __name__ == '__main__':
 
 				analysis.analyzeAndWriteToFile("KNearestNeighbor Classifier_{k}".format(k=n_neighbors), knn_predictionResults, data.getDSTestingDataTargetValues(), foldsEvaluations, 1, 1)
 				# ***************** END KNN *****************
+			elif classifier == 4:
+				# ***************** RF *****************
+				rf_predictionResults = rf(data.getDSTrainingData(), data.getDSTestingData(), data.getDSTargetValues(),
+					data.getDSTestingDataTargetValues())
 
+				foldsEvaluations = [] # single fold list but we still need to use a 3D list
+				foldsEvaluations.append(analysis.calculateEvaluations(rf_predictionResults, data.getDSTestingDataTargetValues()))
+
+				analysis.analyzeAndWriteToFile("Random Forest Classifier", rf_predictionResults, data.getDSTestingDataTargetValues(), foldsEvaluations, 1, 1)
+				# ***************** END RF *****************
 
 	else:
 		if crossValidateFlag:
@@ -319,6 +352,14 @@ if __name__ == '__main__':
 					# add the accuracies for this fold to accuracies list
 					foldsEvaluations.append(analysis.calculateEvaluations(knn_predictionResults, testingDataKey))
 					# ***************** END KNN *****************
+				elif classifier == 4:
+					# ***************** RF *****************
+					# fit and make predictions
+					rf_predictionResults = rf(trainingFolds, testingData, trainingKeys, testingDataKey)
+
+					# add the accuracies for this fold to accuracies list
+					foldsEvaluations.append(analysis.calculateEvaluations(rf_predictionResults, testingDataKey))
+					# ***************** END RF *****************
 
 
 				# increment iterator to process the next fold as testing data
@@ -341,6 +382,10 @@ if __name__ == '__main__':
 				# ***************** KNN *****************
 				analysis.analyzeAndWriteToFile("KNearestNeighbor Classifier_{k}".format(k=n_neighbors), knn_predictionResults, testingDataKey, foldsEvaluations, 10, 2)
 				# ***************** END KNN *****************
+			elif classifier == 4:
+				# ***************** RF *****************
+				analysis.analyzeAndWriteToFile("Random Forest Classifier", rf_predictionResults, testingDataKey, foldsEvaluations, 10, 2)
+				# ***************** END RF *****************
 
 		else:
 			# partition the data set into 70% training and 30% testing
@@ -385,6 +430,19 @@ if __name__ == '__main__':
 
 				analysis.analyzeAndWriteToFile("KNearestNeighbor Classifier_{k}".format(k=n_neighbors), knn_predictionResults, data.getTestingDataTargetValues(), foldsEvaluations, 1, 3)
 				# ***************** END KNN *****************
+
+			elif classifier == 4:
+				# ***************** RF *****************
+				rf_predictionResults = rf(data.getTrainingData(), data.getTestingData(), data.getTrainingDataTargetValues(),
+					data.getTestingDataTargetValues())
+
+				# analyze results using robust evaluations
+				foldsEvaluations = []
+
+				foldsEvaluations.append(analysis.calculateEvaluations(rf_predictionResults, data.getTestingDataTargetValues()))
+
+				analysis.analyzeAndWriteToFile("Random Forest Classifier", rf_predictionResults, data.getTestingDataTargetValues(), foldsEvaluations, 1, 3)
+				# ***************** END RF *****************
 
 	print "\nprogram execution: {t} seconds".format(t=time.clock()-t0)
 	print "exiting"
