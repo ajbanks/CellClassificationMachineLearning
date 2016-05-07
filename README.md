@@ -1,8 +1,8 @@
-# Braden Katzman & Emily Berghoff
-# Columbia University Spring 2016
-# COMS W4761 - Computational Genomics
-# Professor Itsik Pe'er
-# Final Project
+#### Braden Katzman & Emily Berghoff
+#### Columbia University Spring 2016
+#### COMS W4761 - Computational Genomics
+#### Professor Itsik Pe'er
+#### Final Project
 
 
 
