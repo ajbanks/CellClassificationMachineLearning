@@ -2,6 +2,12 @@ from sklearn.neighbors import KNeighborsClassifier
 import sys
 import numpy as np
 
+# File: knn_RNASeq.py
+#	This file defines the K Nearest Neighbor classifier. It allows the user to specificy the number of neighbors used 
+#	and then fits the training data and the samples to the classifier. Then, it takes training data and makes predictions,
+#	returning the results of the predictions.
+
+
 
 # Parameters:
 #	- n_neighbors: number of neighbors to use by default for k_neighbors queries

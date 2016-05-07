@@ -1,6 +1,14 @@
 import sys
 import random
 
+# File: RNASeqData.py
+#	This class object represents the RNA Seq Data. It holds the raw data, the annotations,
+#	and provides methods for partitioning the data. The partitions (for both down sampling
+#	and non down sampling and cross validation and no cross validation) randomly make partitions
+#	of the data for both training and testing, while simultaneously holding the annotations
+#	for the randomly selected testing data. The class also provides accessor methods for all data,
+#	annotations, training data, testing data, and training data target values to evaluate performance.
+
 class RNASeqData(object):
 
 	def __init__(self, raw_data_file, annotations_file):
@@ -31,9 +39,6 @@ class RNASeqData(object):
 	def setRandIndicesFromDS(self, randIndices):
 		# put the indices in ascending order
 		self.randIndices = sorted(randIndices)
-
-	def setFeatures(self, features):
-		self.features = features
 
 	def makeDSTrainingAndTestingData(self):
 		print "\npartitioning data set - 70% training, 30% testing"
@@ -595,9 +600,6 @@ class RNASeqData(object):
 
 	def getDSTestingData(self):
 		return self.dsTestingData
-
-	def getFeatures(self):
-		return self.features
 
 	def getDSTargetValues(self):
 		return self.dsTargetValues

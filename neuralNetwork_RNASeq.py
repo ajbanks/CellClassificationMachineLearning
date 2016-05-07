@@ -1,6 +1,12 @@
 from sklearn.neural_network import MLPClassifier
 import numpy as np
 
+# File: neuralNetwork_RNASeq.py
+#	This file defines the Multi-Layer Perceptron (Neural Network). It fits the training data and the
+#	samples to the classifier. Then, it takes training data and makes predictions, returning the 
+#	results of the predictions.
+
+
 mlpClf = MLPClassifier(activation='relu', algorithm='adam', alpha=1e-05,
        batch_size='auto', beta_1=0.9, beta_2=0.999, early_stopping=False,
        epsilon=1e-08, hidden_layer_sizes=(100,), learning_rate='constant',

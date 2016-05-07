@@ -3,26 +3,20 @@ import time
 import numpy as np
 from RNASeqData import RNASeqData
 import preprocess
-import guassianNB_RNASeq
 import rbfSVC_RNASeq
-import neuralNetwork_RNASeq
+# import neuralNetwork_RNASeq
 import knn_RNASeq
 import randomForest_RNASeq
 import analysis
 
-# run with down sampling and cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 1 1 1
-# run with down sampling and without cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 1 1 0
-# run without downsampling and with cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 1 0 1
-# run without downsampling and without cross validation: python main.py GSE60361C13005Expression.txt expressionmRNAAnnotations.txt 1 0 0
+# File: main.py
+#
+#	This file processes the command line arguments supplied and runs the program using the selected classifier. Based on user input,
+#	the program decides whether to down sample, cross validate, and which classifier to use. This file defines the four classifiers
+# 	supplied to the user for classification: Support Vector Machine using Radial Basis Function Kernel, Mutli-Layer Perceptron (Neural Network), 
+#	K-Nearest Neighbor, and Random Forest. After calling the preproccess code and running the classification, this class sends the results
+#	to an analysis file that performs evaluations and writes the results to file
 
-def gnb(trainingData, testingData, trainingDataTargets, testingDataTargets):
-	# fit training data to gaussian nb
-	guassianNB_RNASeq.fitTrainingData(trainingData, trainingDataTargets)
-
-	# predict values using gaussian nb
-	guassianNB_predictionResults = guassianNB_RNASeq.predictTestData(testingData)
-		
-	return guassianNB_predictionResults
 
 def rbfSVC(trainingData, testingData, trainingDataTargets, testingDataTargets):
 	# fit training data to rbf svc
@@ -66,11 +60,11 @@ if __name__ == '__main__':
 	
 	# check for correct number of args
 	if int(sys.argv[3]) == 3 and len(sys.argv) != 7:
-		print "Usage: python main.py <raw_data_file> <annotations_file> <classifier [0,1,2,3,4] - gnb, svm, nn, knn, rf> <down sample? --> 0,1> <cross validate? --> 0,1> <n_neighbors (only if knn)>"
+		print "Usage: python main.py <raw_data_file> <annotations_file> <classifier [1,2,3,4] - svm, nn, knn, rf> <down sample? --> 0,1> <cross validate? --> 0,1> <n_neighbors (only if knn)>"
 		sys.exit(0)
 	
 	if int(sys.argv[3]) != 3 and len(sys.argv) != 6:
-		print "Usage: python main.py <raw_data_file> <annotations_file> <classifier [0,1,2,3,4] - gnb, svm, nn, knn, rf> <down sample? --> 0,1> <cross validate? --> 0,1> <n_neighbors (only if knn)>"
+		print "Usage: python main.py <raw_data_file> <annotations_file> <classifier [1,2,3,4] - svm, nn, knn, rf> <down sample? --> 0,1> <cross validate? --> 0,1> <n_neighbors (only if knn)>"
 		sys.exit(0)
 
 	raw_data_file = sys.argv[1]
@@ -94,9 +88,7 @@ if __name__ == '__main__':
 	print " - raw data: {raw}".format(raw=raw_data_file)
 	print " - annotations: {ann}".format(ann=annotations_file)
 	
-	if classifier == 0:
-		print " - Using Guassian Naive Bayes Classifier"
-	elif classifier == 1:
+	if classifier == 1:
 		print " - Using Radial Basis Function Kernel Support Vector Machine"
 	elif classifier == 2:
 		print " - Using Multi-Layer Perceptron (Neural Network)"
@@ -177,11 +169,8 @@ if __name__ == '__main__':
 						for key in foldsKey[i]:
 							trainingKeys.append(key)
 					i += 1
-
-				if classifier == 0:
-					x = 0
 				
-				elif classifier == 1:
+				if classifier == 1:
 					# ***************** RBF SVC *****************
 					# fit and make predictions
 					rbfSVC_predictionResults = rbfSVC(trainingFolds, testingData, trainingKeys, testingDataKey)
@@ -223,10 +212,7 @@ if __name__ == '__main__':
 				print "finished fold #{num}".format(num=iterator)
 
 
-			if classifier == 0:
-				x = 0
-
-			elif classifier == 1:
+			if classifier == 1:
 				# ***************** RBF SVC *****************
 				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataKey, foldsEvaluations, 10, 0)
 				# ***************** END RBF SVC *****************
@@ -247,10 +233,7 @@ if __name__ == '__main__':
 			# partition the down sampled data set into 70% training and 30% testing
 			data.makeDSTrainingAndTestingData()
 
-			if classifier == 0:
-				x = 0
-
-			elif classifier == 1:
+			if classifier == 1:
 				# ***************** RBF SVC *****************
 				rbfSVC_predictionResults = rbfSVC(data.getDSTrainingData(), data.getDSTestingData(), data.getDSTargetValues(),
 					data.getDSTestingDataTargetValues())
@@ -325,10 +308,7 @@ if __name__ == '__main__':
 							trainingKeys.append(key)
 					i += 1
 
-				if classifier == 0:
-					x = 0
-
-				elif classifier == 1:
+				if classifier == 1:
 					# ***************** RBF SVC *****************
 					# fit and make predictions
 					rbfSVC_predictionResults = rbfSVC(trainingFolds, testingData, trainingKeys, testingDataKey)
@@ -366,11 +346,7 @@ if __name__ == '__main__':
 				iterator += 1
 				print "finished fold #{num}".format(num=iterator)
 
-
-			if classifier == 0:
-				x = 0
-
-			elif classifier == 1:
+			if classifier == 1:
 				# ***************** RBF SVC *****************
 				analysis.analyzeAndWriteToFile("Radial Basis Function Support Vector Machine", rbfSVC_predictionResults, testingDataKey, foldsEvaluations, 10, 2)
 				# ***************** END RBF SVC *****************
@@ -391,10 +367,7 @@ if __name__ == '__main__':
 			# partition the data set into 70% training and 30% testing
 			data.makeTrainingAndTestingData()
 
-			if classifier == 0:
-				x = 0
-
-			elif classifier == 1:
+			if classifier == 1:
 				# ***************** RBF SVC *****************
 				rbfSVC_predictionResults = rbfSVC(data.getTrainingData(), data.getTestingData(), data.getTrainingDataTargetValues(),
 					data.getTestingDataTargetValues())

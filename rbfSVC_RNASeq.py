@@ -2,12 +2,17 @@
 from sklearn.svm import SVC
 import numpy as np
 
+# File: rbfSVC_RNASeq.py
+#	This file defines the Support Vector Machine using a Radial Basis Function Kernel. It fits the training data and the
+#	samples to the classifier. Then, it takes training data and makes predictions, returning the 
+#	results of the predictions.
+
 # PARAMETERS:
 	# decision function shape : 'ovo' one-vs-one, 'ovr' one-vs-rest, none
-# SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0, 
-# decision_function_shape=None, degree=3, gamma='auto', 
-# kernel='rbf', max_iter=-1, probability=False, random_state=None, 
-# shrinking=True, tol=0.001, verbose=False)
+	# SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0, 
+	# decision_function_shape=None, degree=3, gamma='auto', 
+	# kernel='rbf', max_iter=-1, probability=False, random_state=None, 
+	# shrinking=True, tol=0.001, verbose=False)
 
 rbfSVC = SVC(C=1.0, class_weight=None, coef0=0.0, 
 decision_function_shape=None, degree=3, gamma='auto', 

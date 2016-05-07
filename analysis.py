@@ -5,6 +5,14 @@ import time
 import math
 import numpy as np
 
+
+# File: analysis.py
+#	After classification, this file is used to evaluate the performance of the classifier and write the results to an output file.
+#	First, this file creates a confusion matrix and then computes the accuracy, sensitivity, specificity, MCC, and F1 Score at both
+#	the class level and the global level across the supplied number of folds (10 folds for cross validation and 1 fold for 
+#	non-cross validation). This class also uses a basic metric of merely counting the number of correct classifications that was used
+#	initially to check the performance of the classifiers. After evaluating, the results are written to a file.
+
 # global string variables for writing to file
 tab = "	"
 newLine = "\n"
@@ -692,6 +700,8 @@ def calculateConfusionMatrix(predictions, answerKey, _type):
 				falsePositives += 1
 
 		iterator += 1
+
+	# print "tp, fp, fn, tn = {tp}, {fp}, {fn}, {tn}".format(tp=truePositives, fp=falsePositives, fn=falseNegatives, tn=trueNegatives)
 
 	confusionMatrix = [truePositives, falsePositives, falseNegatives, trueNegatives]
 

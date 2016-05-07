@@ -2,6 +2,11 @@ from sklearn.ensemble import RandomForestClassifier
 import sys
 import numpy as np
 
+# File: randomForest_RNASeq.py
+#	This file defines the Random Forest Classifier. It fits the training data and the
+#	samples to the classifier. Then, it takes training data and makes predictions, returning the 
+#	results of the predictions.
+
 rfClf = RandomForestClassifier(n_estimators=10)
 
 # Source: http://scikit-learn.org/stable/modules/ensemble.html
