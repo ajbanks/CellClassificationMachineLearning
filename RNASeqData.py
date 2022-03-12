@@ -12,7 +12,7 @@ import random
 class RNASeqData(object):
 
 	def __init__(self, raw_data_file, annotations_file):
-		print "\ninitializing RNASeqData"
+		print("\ninitializing RNASeqData")
 		self.raw_data_file = raw_data_file
 		self.annotations_file = annotations_file
 
@@ -41,7 +41,7 @@ class RNASeqData(object):
 		self.randIndices = sorted(randIndices)
 
 	def makeDSTrainingAndTestingData(self):
-		print "\npartitioning data set - 70% training, 30% testing"
+		print("\npartitioning data set - 70% training, 30% testing")
 		# randomly selecte 70% of each cluster for training, 30% for training
 
 		trainingData = []
@@ -110,13 +110,13 @@ class RNASeqData(object):
 		# make sure all types have the same number of cells
 		numCells = len(type1)
 		if len(type2) != numCells or len(type3) != numCells or len(type4) != numCells or len(type5) != numCells or len(type6) != numCells or len(type7) != numCells or len(type8) != numCells or len(type9) != numCells:
-			print "error: not all clusters have {numCells} cells".format(numCells=type1)
+			print("error: not all clusters have {numCells} cells".format(numCells=type1))
 			return
 
 		# randomly choose 70% of the indices of each cluster for training data, remaining for testing data
 
 		# generate a list of indices 0-numCells to use to randomly select cells from each type
-		indices = range(numCells)
+		indices = list(range(numCells))
 
 		# find number of cells which constitue 70% of a cluster
 		numTrainingCellsPerCluster = int(numCells * .7)
@@ -270,7 +270,7 @@ class RNASeqData(object):
 		targetValuesIdxs = []
 
 		if len(type1TrainingCells) != len(type1TrainingCellIdxsAnn):
-			print "error: discrepancy between type 1 training cells and type 1 training cell indices"
+			print("error: discrepancy between type 1 training cells and type 1 training cell indices")
 		else:
 			iterator = 0
 			for cell in type1TrainingCells:
@@ -279,7 +279,7 @@ class RNASeqData(object):
 				iterator += 1
 
 		if len(type2TrainingCells) != len(type2TrainingCellIdxsAnn):
-			print "error: discrepancy between type 2 training cells and type 2 training cell indices"
+			print("error: discrepancy between type 2 training cells and type 2 training cell indices")
 		else:
 			iterator = 0
 			for cell in type2TrainingCells:
@@ -288,7 +288,7 @@ class RNASeqData(object):
 				iterator += 1
 
 		if len(type3TrainingCells) != len(type3TrainingCellIdxsAnn):
-			print "error: discrepancy between type 3 training cells and type 3 training cell indices"
+			print("error: discrepancy between type 3 training cells and type 3 training cell indices")
 		else:
 			iterator = 0
 			for cell in type3TrainingCells:
@@ -297,7 +297,7 @@ class RNASeqData(object):
 				iterator += 1
 
 		if len(type4TrainingCells) != len(type4TrainingCellIdxsAnn):
-			print "error: discrepancy between type 4 training cells and type 4 training cell indices"
+			print("error: discrepancy between type 4 training cells and type 4 training cell indices")
 		else:
 			iterator = 0
 			for cell in type4TrainingCells:
@@ -306,7 +306,7 @@ class RNASeqData(object):
 				iterator += 1
 
 		if len(type5TrainingCells) != len(type5TrainingCellIdxsAnn):
-			print "error: discrepancy between type 9 training cells and type 9 training cell indices"
+			print("error: discrepancy between type 9 training cells and type 9 training cell indices")
 		else:
 			iterator = 0
 			for cell in type5TrainingCells:
@@ -315,7 +315,7 @@ class RNASeqData(object):
 				iterator += 1
 
 		if len(type6TrainingCells) != len(type6TrainingCellIdxsAnn):
-			print "error: discrepancy between type 6 training cells and type 6 training cell indices"
+			print("error: discrepancy between type 6 training cells and type 6 training cell indices")
 		else:
 			iterator = 0
 			for cell in type6TrainingCells:
@@ -324,7 +324,7 @@ class RNASeqData(object):
 				iterator += 1
 
 		if len(type7TrainingCells) != len(type7TrainingCellIdxsAnn):
-			print "error: discrepancy between type 7 training cells and type 7 training cell indices"
+			print("error: discrepancy between type 7 training cells and type 7 training cell indices")
 		else:
 			iterator = 0
 			for cell in type7TrainingCells:
@@ -333,7 +333,7 @@ class RNASeqData(object):
 				iterator += 1
 
 		if len(type8TrainingCells) != len(type8TrainingCellIdxsAnn):
-			print "error: discrepancy between type 8 training cells and type 8 training cell indices"
+			print("error: discrepancy between type 8 training cells and type 8 training cell indices")
 		else:
 			iterator = 0
 			for cell in type8TrainingCells:
@@ -342,7 +342,7 @@ class RNASeqData(object):
 				iterator += 1
 
 		if len(type9TrainingCells) != len(type9TrainingCellIdxsAnn):
-			print "error: discrepancy between type 9 training cells and type 9 training cell indices"
+			print("error: discrepancy between type 9 training cells and type 9 training cell indices")
 		else:
 			iterator = 0
 			for cell in type9TrainingCells:
@@ -397,20 +397,20 @@ class RNASeqData(object):
 		numTrainingDataCells = len(self.dsTrainingData)
 		numTestingDataCells = len(self.dsTestingData)
 
-		print "number training cells = {numTrainingDataCells}".format(numTrainingDataCells=numTrainingDataCells)
-		print "number testing cells = {numTestingDataCells}".format(numTestingDataCells=numTestingDataCells)
-		print "reference:"
-		print "- total down sampled cells = {dsCells}".format(dsCells=len(self.dsCluster_MoleculeData))
-		print "- down sampled cells * .7 = {dsCellsTraining} --> approx.".format(dsCellsTraining=int(len(self.dsCluster_MoleculeData)*.7))
-		print "- down sampled cells * .3 = {dsCellsTesting} --> approx.".format(dsCellsTesting=int(len(self.dsCluster_MoleculeData)*.3))
+		print("number training cells = {numTrainingDataCells}".format(numTrainingDataCells=numTrainingDataCells))
+		print("number testing cells = {numTestingDataCells}".format(numTestingDataCells=numTestingDataCells))
+		print("reference:")
+		print("- total down sampled cells = {dsCells}".format(dsCells=len(self.dsCluster_MoleculeData)))
+		print("- down sampled cells * .7 = {dsCellsTraining} --> approx.".format(dsCellsTraining=int(len(self.dsCluster_MoleculeData)*.7)))
+		print("- down sampled cells * .3 = {dsCellsTesting} --> approx.".format(dsCellsTesting=int(len(self.dsCluster_MoleculeData)*.3)))
 
 	def makeTrainingAndTestingData(self):
-		print "\npartitioning data set - random 70% traning, 30% testing"
+		print("\npartitioning data set - random 70% traning, 30% testing")
 		# training data (random 70%, 30%), target values for training data
 		# testing data, target values for training data
 
 		# generate a list of indices 0-numCellsTotal to use to randomly select cells
-		indices = range(self.getNumCellsRaw())
+		indices = list(range(self.getNumCellsRaw()))
 
 		# find number of cells which constitue 70% the raw data
 		numTrainingCells = int(int(self.getNumCellsRaw())*.7)
@@ -438,17 +438,17 @@ class RNASeqData(object):
 		numTrainingDataCells = len(self.trainingCells)
 		numTestingDataCells = len(self.testingCells)
 
-		print "number training cells = {numTrainingDataCells}".format(numTrainingDataCells=numTrainingDataCells)
-		print "number testing cells = {numTestingDataCells}".format(numTestingDataCells=numTestingDataCells)
-		print "reference:"
-		print "- total cells = {numCells}".format(numCells=self.getNumCellsRaw())
-		print "- total cells * .7 = {cellsTraining} --> approx.".format(cellsTraining=numTrainingCells)
-		print "- total cells cells * .3 = {cellsTesting} --> approx.".format(cellsTesting=int(self.getNumCellsRaw()*.3))
+		print("number training cells = {numTrainingDataCells}".format(numTrainingDataCells=numTrainingDataCells))
+		print("number testing cells = {numTestingDataCells}".format(numTestingDataCells=numTestingDataCells))
+		print("reference:")
+		print("- total cells = {numCells}".format(numCells=self.getNumCellsRaw()))
+		print("- total cells * .7 = {cellsTraining} --> approx.".format(cellsTraining=numTrainingCells))
+		print("- total cells cells * .3 = {cellsTesting} --> approx.".format(cellsTesting=int(self.getNumCellsRaw()*.3)))
 
 
 	def makeCrossValidationTrainingAndTestingData(self, downSampleFlag):
 		if downSampleFlag:
-			print "\npartitioning down sampled data set into 10 folds for 10-fold cross validation"
+			print("\npartitioning down sampled data set into 10 folds for 10-fold cross validation")
 
 			# divide the list into 1/10 folds
 			foldSize = len(self.getRandIndices()) / 10
@@ -507,15 +507,15 @@ class RNASeqData(object):
 
 			# set the list of keys to a class wide variable
 			self.foldsKey = foldsKey
-			print "done"
+			print("done")
 			return
 
 
 		else:
-			print "\npartitioning raw data set into 10 folds for 10-fold cross validation"
+			print("\npartitioning raw data set into 10 folds for 10-fold cross validation")
 
 			# initialize a list of indices corresponding to the numbers of cells in the data set
-			indices = range(self.getNumCellsRaw())
+			indices = list(range(self.getNumCellsRaw()))
 
 			# randomly shuffle the list
 			random.shuffle(indices)
@@ -574,7 +574,7 @@ class RNASeqData(object):
 			# set the list of keys to a class wide variable
 			self.foldsKey = foldsKey
 
-			print "done"
+			print("done")
 			return
 
 	def getRawDataFileName(self):
@@ -644,6 +644,6 @@ class RNASeqData(object):
 		return len(self.dsClusterData[0])
 
 	def partitionData(self):
-		print "partitioning data"
+		print("partitioning data")
 		# self.trainingData
 		# self.testData

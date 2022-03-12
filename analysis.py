@@ -1,4 +1,4 @@
-from __future__ import division
+
 import sys
 import os
 import time
@@ -49,7 +49,7 @@ def analyzeAndWriteToFile(classifier, predictions, answerKey, foldsEvaluations, 
 
 	fileName = clf + "_" + date + "_" + t + ".txt"
 
-	print "\nAnalyzing results and writing to file {fileName}".format(fileName=fileName)
+	print("\nAnalyzing results and writing to file {fileName}".format(fileName=fileName))
 	
 	# check if there is a 'results' directory in the project root
 	if not os.path.exists(topLevelDirName):
@@ -86,14 +86,14 @@ def analyzeAndWriteToFile(classifier, predictions, answerKey, foldsEvaluations, 
 		file = open(topLevelDirName + "/" + NotDSAndNotCVDirName + "/" + fileName, "w+")
 
 
-	print "** note: basic analysis only on final fold of cross validation"
+	print("** note: basic analysis only on final fold of cross validation")
 	accuracies = analyzeResultsBasic(classifier, predictions, answerKey)
 	
 	sensitivities, specificities, mccs, f1Scores, globalVals = analyzeResultsRobust(foldsEvaluations, k)
 
 	# make sure the results lists are the correct size
 	if len(accuracies) != 9 and len(sensitivies) != 9 and len(specificities) != 9 and len(mccs) != 9 and len(f1Scores) != 9 and len(globalVals) != 5:
-		print "error: results list are incorrect size - cannot write to file"
+		print("error: results list are incorrect size - cannot write to file")
 		file.close()
 		return
 
@@ -123,7 +123,7 @@ def formatLine(type, accuracy, sensitivity, specificity, mcc, f1score):
 def calculateEvaluations(predictions, answerKey):
 	# make sure lengths are equal
 	if len(predictions) != len(answerKey):
-		print "error: discrepancy between number of prediction results and answey keys"
+		print("error: discrepancy between number of prediction results and answey keys")
 
 
 	# confusionMatrix = [truePositives, falsePositives, falseNegatives, trueNegatives]
@@ -168,10 +168,10 @@ def calculateFoldEvaluations(confusionMatrix):
 	return foldEvaluation
 
 def analyzeResultsRobust(foldsEvaluations, k):
-	print "\nanalyzing evaluations for {k}-fold cross validation".format(k=k)
+	print("\nanalyzing evaluations for {k}-fold cross validation".format(k=k))
 
 	if len(foldsEvaluations) != k and len(foldsEvaluations[0]) != 9 and len(foldsEvaluations[0][0]) != 5:
-		print "error: 3D evaluations list is incorrect size"
+		print("error: 3D evaluations list is incorrect size")
 		return
 
 	# initialize values for avg accuracy, sensitivity, specificity, MCC, F1Score for each class and for all classes
@@ -373,56 +373,56 @@ def analyzeResultsRobust(foldsEvaluations, k):
 	# print " - Type 8: {avgAccuracyType8}".format(avgAccuracyType8=avgAccuracyType8)
 	# print " - Type 9: {avgAccuracyType9}".format(avgAccuracyType9=avgAccuracyType9)
 
-	print "\nAverage sensitivity per type: "
-	print " - Type 1: {avgSensitivityType1}".format(avgSensitivityType1=avgSensitivityType1)
-	print " - Type 2: {avgSensitivityType2}".format(avgSensitivityType2=avgSensitivityType2)
-	print " - Type 3: {avgSensitivityType3}".format(avgSensitivityType3=avgSensitivityType3)
-	print " - Type 4: {avgSensitivityType4}".format(avgSensitivityType4=avgSensitivityType4)
-	print " - Type 5: {avgSensitivityType5}".format(avgSensitivityType5=avgSensitivityType5)
-	print " - Type 6: {avgSensitivityType6}".format(avgSensitivityType6=avgSensitivityType6)
-	print " - Type 7: {avgSensitivityType7}".format(avgSensitivityType7=avgSensitivityType7)
-	print " - Type 8: {avgSensitivityType8}".format(avgSensitivityType8=avgSensitivityType8)
-	print " - Type 9: {avgSensitivityType9}".format(avgSensitivityType9=avgSensitivityType9)
+	print("\nAverage sensitivity per type: ")
+	print(" - Type 1: {avgSensitivityType1}".format(avgSensitivityType1=avgSensitivityType1))
+	print(" - Type 2: {avgSensitivityType2}".format(avgSensitivityType2=avgSensitivityType2))
+	print(" - Type 3: {avgSensitivityType3}".format(avgSensitivityType3=avgSensitivityType3))
+	print(" - Type 4: {avgSensitivityType4}".format(avgSensitivityType4=avgSensitivityType4))
+	print(" - Type 5: {avgSensitivityType5}".format(avgSensitivityType5=avgSensitivityType5))
+	print(" - Type 6: {avgSensitivityType6}".format(avgSensitivityType6=avgSensitivityType6))
+	print(" - Type 7: {avgSensitivityType7}".format(avgSensitivityType7=avgSensitivityType7))
+	print(" - Type 8: {avgSensitivityType8}".format(avgSensitivityType8=avgSensitivityType8))
+	print(" - Type 9: {avgSensitivityType9}".format(avgSensitivityType9=avgSensitivityType9))
 
-	print "\nAverage specificity per type: "
-	print " - Type 1: {avgSpecificityType1}".format(avgSpecificityType1=avgSpecificityType1)
-	print " - Type 2: {avgSpecificityType2}".format(avgSpecificityType2=avgSpecificityType2)
-	print " - Type 3: {avgSpecificityType3}".format(avgSpecificityType3=avgSpecificityType3)
-	print " - Type 4: {avgSpecificityType4}".format(avgSpecificityType4=avgSpecificityType4)
-	print " - Type 5: {avgSpecificityType5}".format(avgSpecificityType5=avgSpecificityType5)
-	print " - Type 6: {avgSpecificityType6}".format(avgSpecificityType6=avgSpecificityType6)
-	print " - Type 7: {avgSpecificityType7}".format(avgSpecificityType7=avgSpecificityType7)
-	print " - Type 8: {avgSpecificityType8}".format(avgSpecificityType8=avgSpecificityType8)
-	print " - Type 9: {avgSpecificityType9}".format(avgSpecificityType9=avgSpecificityType9)
+	print("\nAverage specificity per type: ")
+	print(" - Type 1: {avgSpecificityType1}".format(avgSpecificityType1=avgSpecificityType1))
+	print(" - Type 2: {avgSpecificityType2}".format(avgSpecificityType2=avgSpecificityType2))
+	print(" - Type 3: {avgSpecificityType3}".format(avgSpecificityType3=avgSpecificityType3))
+	print(" - Type 4: {avgSpecificityType4}".format(avgSpecificityType4=avgSpecificityType4))
+	print(" - Type 5: {avgSpecificityType5}".format(avgSpecificityType5=avgSpecificityType5))
+	print(" - Type 6: {avgSpecificityType6}".format(avgSpecificityType6=avgSpecificityType6))
+	print(" - Type 7: {avgSpecificityType7}".format(avgSpecificityType7=avgSpecificityType7))
+	print(" - Type 8: {avgSpecificityType8}".format(avgSpecificityType8=avgSpecificityType8))
+	print(" - Type 9: {avgSpecificityType9}".format(avgSpecificityType9=avgSpecificityType9))
 
-	print "\nAverage MCC per type: "
-	print " - Type 1: {avgMccType1}".format(avgMccType1=avgMccType1)
-	print " - Type 2: {avgMccType2}".format(avgMccType2=avgMccType2)
-	print " - Type 3: {avgMccType3}".format(avgMccType3=avgMccType3)
-	print " - Type 4: {avgMccType4}".format(avgMccType4=avgMccType4)
-	print " - Type 5: {avgMccType5}".format(avgMccType5=avgMccType5)
-	print " - Type 6: {avgMccType6}".format(avgMccType6=avgMccType6)
-	print " - Type 7: {avgMccType7}".format(avgMccType7=avgMccType7)
-	print " - Type 8: {avgMccType8}".format(avgMccType8=avgMccType8)
-	print " - Type 9: {avgMccType9}".format(avgMccType9=avgMccType9)
+	print("\nAverage MCC per type: ")
+	print(" - Type 1: {avgMccType1}".format(avgMccType1=avgMccType1))
+	print(" - Type 2: {avgMccType2}".format(avgMccType2=avgMccType2))
+	print(" - Type 3: {avgMccType3}".format(avgMccType3=avgMccType3))
+	print(" - Type 4: {avgMccType4}".format(avgMccType4=avgMccType4))
+	print(" - Type 5: {avgMccType5}".format(avgMccType5=avgMccType5))
+	print(" - Type 6: {avgMccType6}".format(avgMccType6=avgMccType6))
+	print(" - Type 7: {avgMccType7}".format(avgMccType7=avgMccType7))
+	print(" - Type 8: {avgMccType8}".format(avgMccType8=avgMccType8))
+	print(" - Type 9: {avgMccType9}".format(avgMccType9=avgMccType9))
 
-	print "\nAverage F1 Score per type: "
-	print " - Type 1: {avgF1ScoreType1}".format(avgF1ScoreType1=avgF1ScoreType1)
-	print " - Type 2: {avgF1ScoreType2}".format(avgF1ScoreType2=avgF1ScoreType2)
-	print " - Type 3: {avgF1ScoreType3}".format(avgF1ScoreType3=avgF1ScoreType3)
-	print " - Type 4: {avgF1ScoreType4}".format(avgF1ScoreType4=avgF1ScoreType4)
-	print " - Type 5: {avgF1ScoreType5}".format(avgF1ScoreType5=avgF1ScoreType5)
-	print " - Type 6: {avgF1ScoreType6}".format(avgF1ScoreType6=avgF1ScoreType6)
-	print " - Type 7: {avgF1ScoreType7}".format(avgF1ScoreType7=avgF1ScoreType7)
-	print " - Type 8: {avgF1ScoreType8}".format(avgF1ScoreType8=avgF1ScoreType8)
-	print " - Type 9: {avgF1ScoreType9}".format(avgF1ScoreType9=avgF1ScoreType9)
+	print("\nAverage F1 Score per type: ")
+	print(" - Type 1: {avgF1ScoreType1}".format(avgF1ScoreType1=avgF1ScoreType1))
+	print(" - Type 2: {avgF1ScoreType2}".format(avgF1ScoreType2=avgF1ScoreType2))
+	print(" - Type 3: {avgF1ScoreType3}".format(avgF1ScoreType3=avgF1ScoreType3))
+	print(" - Type 4: {avgF1ScoreType4}".format(avgF1ScoreType4=avgF1ScoreType4))
+	print(" - Type 5: {avgF1ScoreType5}".format(avgF1ScoreType5=avgF1ScoreType5))
+	print(" - Type 6: {avgF1ScoreType6}".format(avgF1ScoreType6=avgF1ScoreType6))
+	print(" - Type 7: {avgF1ScoreType7}".format(avgF1ScoreType7=avgF1ScoreType7))
+	print(" - Type 8: {avgF1ScoreType8}".format(avgF1ScoreType8=avgF1ScoreType8))
+	print(" - Type 9: {avgF1ScoreType9}".format(avgF1ScoreType9=avgF1ScoreType9))
 
-	print "\n Average global values: "
-	print " - Accuracy: {avgAccuracy}".format(avgAccuracy=avgAccuracy)
-	print " - Sensitivity: {avgSensitivity}".format(avgSensitivity=avgSensitivity)
-	print " - Specificity: {avgSpecificity}".format(avgSpecificity=avgSpecificity)
-	print " - MCC: {avgMcc}".format(avgMcc=avgMcc)
-	print " - F1 Score: {avgF1Score}".format(avgF1Score=avgF1Score)
+	print("\n Average global values: ")
+	print(" - Accuracy: {avgAccuracy}".format(avgAccuracy=avgAccuracy))
+	print(" - Sensitivity: {avgSensitivity}".format(avgSensitivity=avgSensitivity))
+	print(" - Specificity: {avgSpecificity}".format(avgSpecificity=avgSpecificity))
+	print(" - MCC: {avgMcc}".format(avgMcc=avgMcc))
+	print(" - F1 Score: {avgF1Score}".format(avgF1Score=avgF1Score))
 
 	# make lists of each category to return to calling method (for write to file)
 	sensitivities = [avgSensitivityType1, avgSensitivityType2, avgSensitivityType3, avgSensitivityType4, avgSensitivityType5, 
@@ -442,11 +442,11 @@ def analyzeResultsRobust(foldsEvaluations, k):
 
 
 def analyzeResultsBasic(classifier, predictions, answerKey):
-	print "\nanalyzing results for {classifier} classifier using basic metric".format(classifier=classifier)
+	print("\nanalyzing results for {classifier} classifier using basic metric".format(classifier=classifier))
 
 	# make sure lengths are equal
 	if len(predictions) != len(answerKey):
-		print "error: discrepancy between number of prediction results and answey keys"
+		print("error: discrepancy between number of prediction results and answey keys")
 		return
 
 	# initialize lists for each identifier for prediction results and answer key
@@ -594,30 +594,30 @@ def analyzeResultsBasic(classifier, predictions, answerKey):
 	totalPredictionResults = calculateTotalAccuracy(type1Results, type2Results, type3Results, type4Results, type5Results,
 		type6Results, type7Results, type8Results, type9Results)
 
-	print "Accuracy determined by:"
-	print "if number of predictions > total known cells of type:"
-	print "    accuracy = 1.0 - ((1/number_cells_type) * (number of predictions - known number of cells)"
-	print "else:"
-	print "    accuracy = Number_of_Type_Predicted / Actual_Number_of_Type"
-	print "Type 1 accuracy (predictions: {type1ResultsCount}, known: {type1KeyCounts}) = {type1Results}".format(type1ResultsCount=type1ResultsCount, 
-		type1KeyCounts=type1KeyCounts, type1Results=type1Results)
-	print "Type 2 accuracy (predictions: {type2ResultsCount}, known: {type2KeyCounts}) = {type2Results}".format(type2ResultsCount=type2ResultsCount, 
-		type2KeyCounts=type2KeyCounts, type2Results=type2Results)
-	print "Type 3 accuracy (predictions: {type3ResultsCount}, known: {type3KeyCounts}) = {type3Results}".format(type3ResultsCount=type3ResultsCount, 
-		type3KeyCounts=type3KeyCounts, type3Results=type3Results)
-	print "Type 4 accuracy (predictions: {type4ResultsCount}, known: {type4KeyCounts}) = {type4Results}".format(type4ResultsCount=type4ResultsCount, 
-		type4KeyCounts=type4KeyCounts, type4Results=type4Results)
-	print "Type 5 accuracy (predictions: {type5ResultsCount}, known: {type5KeyCounts}) = {type5Results}".format(type5ResultsCount=type5ResultsCount, 
-		type5KeyCounts=type5KeyCounts, type5Results=type5Results)
-	print "Type 6 accuracy (predictions: {type6ResultsCount}, known: {type6KeyCounts}) = {type6Results}".format(type6ResultsCount=type6ResultsCount, 
-		type6KeyCounts=type6KeyCounts, type6Results=type6Results)
-	print "Type 7 accuracy (predictions: {type7ResultsCount}, known: {type7KeyCounts}) = {type7Results}".format(type7ResultsCount=type7ResultsCount, 
-		type7KeyCounts=type7KeyCounts, type7Results=type7Results)
-	print "Type 8 accuracy (predictions: {type8ResultsCount}, known: {type8KeyCounts}) = {type8Results}".format(type8ResultsCount=type8ResultsCount, 
-		type8KeyCounts=type8KeyCounts, type8Results=type8Results)
-	print "Type 9 accuracy (predictions: {type9ResultsCount}, known: {type9KeyCounts}) = {type9Results}".format(type9ResultsCount=type9ResultsCount, 
-		type9KeyCounts=type9KeyCounts, type9Results=type9Results)
-	print "Total accuracy (non_zero_prediction_results/num_non_zero_values) = {totalPredictionResults}".format(totalPredictionResults=totalPredictionResults)
+	print("Accuracy determined by:")
+	print("if number of predictions > total known cells of type:")
+	print("    accuracy = 1.0 - ((1/number_cells_type) * (number of predictions - known number of cells)")
+	print("else:")
+	print("    accuracy = Number_of_Type_Predicted / Actual_Number_of_Type")
+	print("Type 1 accuracy (predictions: {type1ResultsCount}, known: {type1KeyCounts}) = {type1Results}".format(type1ResultsCount=type1ResultsCount, 
+		type1KeyCounts=type1KeyCounts, type1Results=type1Results))
+	print("Type 2 accuracy (predictions: {type2ResultsCount}, known: {type2KeyCounts}) = {type2Results}".format(type2ResultsCount=type2ResultsCount, 
+		type2KeyCounts=type2KeyCounts, type2Results=type2Results))
+	print("Type 3 accuracy (predictions: {type3ResultsCount}, known: {type3KeyCounts}) = {type3Results}".format(type3ResultsCount=type3ResultsCount, 
+		type3KeyCounts=type3KeyCounts, type3Results=type3Results))
+	print("Type 4 accuracy (predictions: {type4ResultsCount}, known: {type4KeyCounts}) = {type4Results}".format(type4ResultsCount=type4ResultsCount, 
+		type4KeyCounts=type4KeyCounts, type4Results=type4Results))
+	print("Type 5 accuracy (predictions: {type5ResultsCount}, known: {type5KeyCounts}) = {type5Results}".format(type5ResultsCount=type5ResultsCount, 
+		type5KeyCounts=type5KeyCounts, type5Results=type5Results))
+	print("Type 6 accuracy (predictions: {type6ResultsCount}, known: {type6KeyCounts}) = {type6Results}".format(type6ResultsCount=type6ResultsCount, 
+		type6KeyCounts=type6KeyCounts, type6Results=type6Results))
+	print("Type 7 accuracy (predictions: {type7ResultsCount}, known: {type7KeyCounts}) = {type7Results}".format(type7ResultsCount=type7ResultsCount, 
+		type7KeyCounts=type7KeyCounts, type7Results=type7Results))
+	print("Type 8 accuracy (predictions: {type8ResultsCount}, known: {type8KeyCounts}) = {type8Results}".format(type8ResultsCount=type8ResultsCount, 
+		type8KeyCounts=type8KeyCounts, type8Results=type8Results))
+	print("Type 9 accuracy (predictions: {type9ResultsCount}, known: {type9KeyCounts}) = {type9Results}".format(type9ResultsCount=type9ResultsCount, 
+		type9KeyCounts=type9KeyCounts, type9Results=type9Results))
+	print("Total accuracy (non_zero_prediction_results/num_non_zero_values) = {totalPredictionResults}".format(totalPredictionResults=totalPredictionResults))
 
 	# make list of basic accuracies
 	accuracies = [type1Results, type2Results, type3Results, type4Results, type5Results, type6Results, type7Results, type8Results, type9Results]
@@ -671,7 +671,7 @@ def calculateTotalAccuracy(type1Results, type2Results, type3Results, type4Result
 def calculateConfusionMatrix(predictions, answerKey, _type):
 	# compute the confusion matrix (true positive, false negative, false positive, true negative) for the given type
 	if len(predictions) != len(answerKey):
-		print "error: discrepancy between number of predictions and answer key"
+		print("error: discrepancy between number of predictions and answer key")
 
 	size = len(predictions)
 

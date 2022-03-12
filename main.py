@@ -4,7 +4,7 @@ import numpy as np
 from RNASeqData import RNASeqData
 import preprocess
 import rbfSVC_RNASeq
-# import neuralNetwork_RNASeq
+import neuralNetwork_RNASeq
 import knn_RNASeq
 import randomForest_RNASeq
 import analysis
@@ -55,16 +55,16 @@ def rf(trainingData, testingData, trainingDataTargets, testingDataTargets):
 	return rf_predictionResults
 
 if __name__ == '__main__':
-	t0 = time.clock()
-	print "start"
+	t0 = time.perf_counter()
+	print("start")
 	
 	# check for correct number of args
 	if int(sys.argv[3]) == 3 and len(sys.argv) != 7:
-		print "Usage: python main.py <raw_data_file> <annotations_file> <classifier [1,2,3,4] - svm, nn, knn, rf> <down sample? --> 0,1> <cross validate? --> 0,1> <n_neighbors (only if knn)>"
+		print("Usage: python main.py <raw_data_file> <annotations_file> <classifier [1,2,3,4] - svm, nn, knn, rf> <down sample? --> 0,1> <cross validate? --> 0,1> <n_neighbors (only if knn)>")
 		sys.exit(0)
 	
 	if int(sys.argv[3]) != 3 and len(sys.argv) != 6:
-		print "Usage: python main.py <raw_data_file> <annotations_file> <classifier [1,2,3,4] - svm, nn, knn, rf> <down sample? --> 0,1> <cross validate? --> 0,1> <n_neighbors (only if knn)>"
+		print("Usage: python main.py <raw_data_file> <annotations_file> <classifier [1,2,3,4] - svm, nn, knn, rf> <down sample? --> 0,1> <cross validate? --> 0,1> <n_neighbors (only if knn)>")
 		sys.exit(0)
 
 	raw_data_file = sys.argv[1]
@@ -84,30 +84,30 @@ if __name__ == '__main__':
 
 
 
-	print "Using:"
-	print " - raw data: {raw}".format(raw=raw_data_file)
-	print " - annotations: {ann}".format(ann=annotations_file)
+	print("Using:")
+	print(" - raw data: {raw}".format(raw=raw_data_file))
+	print(" - annotations: {ann}".format(ann=annotations_file))
 	
 	if classifier == 1:
-		print " - Using Radial Basis Function Kernel Support Vector Machine"
+		print(" - Using Radial Basis Function Kernel Support Vector Machine")
 	elif classifier == 2:
-		print " - Using Multi-Layer Perceptron (Neural Network)"
+		print(" - Using Multi-Layer Perceptron (Neural Network)")
 	elif classifier == 3:
-		print " - Using K Nearest Neighbor Classifier with k = {k}".format(k=n_neighbors)
+		print(" - Using K Nearest Neighbor Classifier with k = {k}".format(k=n_neighbors))
 	elif classifier == 4:
-		print " - Using Random Forest Classifier"
+		print(" - Using Random Forest Classifier")
 	else:
-		print "** ERROR: invalid classifier selection"
+		print("** ERROR: invalid classifier selection")
 		sys.exit(0)
 	
 	if downSampleFlag:
-		print "** Down sampling enabled **"
+		print("** Down sampling enabled **")
 	else:
-		print "** Down sampling disabled **"
+		print("** Down sampling disabled **")
 	if crossValidateFlag:
-		print "** Cross validation enabled **"
+		print("** Cross validation enabled **")
 	else:
-		print "** Cross validation disabled **"
+		print("** Cross validation disabled **")
 
 
 	# initialize the data set class
@@ -149,7 +149,7 @@ if __name__ == '__main__':
 
 			# make sure the data is parallel
 			if len(folds) != len(foldsKey) or len(folds[0]) != len(foldsKey[0]):
-				print "error: folds and folds key are not parallel data sets"
+				print("error: folds and folds key are not parallel data sets")
 				sys.exit(0)
 
 			iterator = 0 # we'll use this to iterate through folds and use each as the training data
@@ -209,7 +209,7 @@ if __name__ == '__main__':
 
 				# increment iterator to process the next fold as testing data
 				iterator += 1
-				print "finished fold #{num}".format(num=iterator)
+				print("finished fold #{num}".format(num=iterator))
 
 
 			if classifier == 1:
@@ -287,7 +287,7 @@ if __name__ == '__main__':
 
 			# make sure the data is parallel
 			if len(folds) != len(foldsKey) or len(folds[0]) != len(foldsKey[0]):
-				print "error: folds and folds key are not parallel data sets"
+				print("error: folds and folds key are not parallel data sets")
 				sys.exit(0)
 
 			iterator = 0 # we'll use this to iterate through folds and use each as the training data
@@ -344,7 +344,7 @@ if __name__ == '__main__':
 
 				# increment iterator to process the next fold as testing data
 				iterator += 1
-				print "finished fold #{num}".format(num=iterator)
+				print("finished fold #{num}".format(num=iterator))
 
 			if classifier == 1:
 				# ***************** RBF SVC *****************
@@ -417,5 +417,5 @@ if __name__ == '__main__':
 				analysis.analyzeAndWriteToFile("Random Forest Classifier", rf_predictionResults, data.getTestingDataTargetValues(), foldsEvaluations, 1, 3)
 				# ***************** END RF *****************
 
-	print "\nprogram execution: {t} seconds".format(t=time.clock()-t0)
-	print "exiting"
+	print("\nprogram execution: {t} seconds".format(t=time.perf_counter()-t0))
+	print("exiting")

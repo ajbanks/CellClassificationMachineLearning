@@ -7,13 +7,14 @@ import numpy as np
 #	results of the predictions.
 
 
-mlpClf = MLPClassifier(activation='relu', algorithm='adam', alpha=1e-05,
-       batch_size='auto', beta_1=0.9, beta_2=0.999, early_stopping=False,
-       epsilon=1e-08, hidden_layer_sizes=(100,), learning_rate='constant',
-       learning_rate_init=0.001, max_iter=200, momentum=0.9,
-       nesterovs_momentum=True, power_t=0.5, random_state=1, shuffle=True,
-       tol=0.0001, validation_fraction=0.1, verbose=False,
-       warm_start=False)
+mlpClf = MLPClassifier(hidden_layer_sizes=[100], max_iter=200)
+# activation='relu', alpha=1e-05,
+#        batch_size='auto', beta_1=0.9, beta_2=0.999, early_stopping=False,
+#        epsilon=1e-08, hidden_layer_sizes=(100,), learning_rate='constant',
+#        learning_rate_init=0.001, max_iter=200, momentum=0.9,
+#        nesterovs_momentum=True, power_t=0.5, random_state=1, shuffle=True,
+#        tol=0.0001, validation_fraction=0.1, verbose=False,
+#        warm_start=False)
 
 # Source: http://scikit-learn.org/dev/modules/neural_networks_supervised.html
 def fitTrainingData(training_data, nSamples):

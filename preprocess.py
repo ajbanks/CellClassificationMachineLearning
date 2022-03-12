@@ -1,4 +1,4 @@
-from __future__ import division
+
 import sys
 import xlrd
 from sklearn import preprocessing
@@ -13,7 +13,7 @@ import math
 #	cluster size and molecule count.
 
 def loadRawData(fileName):
-	print "\nreading data into memory"
+	print("\nreading data into memory")
 
 	# the 9 cell type classifying genes
 	Thy1 = "Thy1"
@@ -54,31 +54,31 @@ def loadRawData(fileName):
 				gene = geneExpressions.pop(0)
 
 				if gene == Thy1:
-					print "Processing classifier Thy1"
+					print("Processing classifier Thy1")
 				
 				elif gene == Gad1:
-					print "Processing classifier Gad1"
+					print("Processing classifier Gad1")
 				
 				elif gene == Tbr1:
-					print "Processing classifier Tbr1"
+					print("Processing classifier Tbr1")
 				
 				elif gene == Spink8:
-					print "Processing classifier Spink8"
+					print("Processing classifier Spink8")
 				
 				elif gene == Mbp:
-					print "Processing classifier Mbp"
+					print("Processing classifier Mbp")
 				
 				elif gene == Aldoc:
-					print "Processing classifier Aldoc"
+					print("Processing classifier Aldoc")
 				
 				elif gene == Aif1:
-					print "Processing classifier Aif1"
+					print("Processing classifier Aif1")
 				
 				elif gene == Cldn5:
-					print "Processing classifier Cldn5"
+					print("Processing classifier Cldn5")
 				
 				elif gene == Acta2:
-					print "Processing classifier Acta2"
+					print("Processing classifier Acta2")
 
 				# initialize empty list to hold gene reads
 				geneReads = []
@@ -99,18 +99,18 @@ def loadRawData(fileName):
 							idx+=1
 						genesUsed += 1 # move to next gene (next row)
 					else:
-						print "{geneReads} - {cells}".format(geneReads=len(geneReads), cells=cellIdx) # error check
+						print("{geneReads} - {cells}".format(geneReads=len(geneReads), cells=cellIdx)) # error check
 
-	print "Added {numGenes} gene reads to {numCells} cells".format(numGenes=genesUsed, numCells=cellIdx)
-	print "Reduced data dimensionality by removing {numGenesRemoved} genes with <= 25 total reads".format(numGenesRemoved=genesRemoved)
+	print("Added {numGenes} gene reads to {numCells} cells".format(numGenes=genesUsed, numCells=cellIdx))
+	print("Reduced data dimensionality by removing {numGenesRemoved} genes with <= 25 total reads".format(numGenesRemoved=genesRemoved))
 
-	print "rows (cells) = {rows}".format(rows=len(data))
-	print "cols (genes) = {cols}".format(cols=len(data[0]))
+	print("rows (cells) = {rows}".format(rows=len(data)))
+	print("cols (genes) = {cols}".format(cols=len(data[0])))
 
 	return data
 
 def loadCellIdentifierAnnotations(fileName, numCells):
-	print "\nloading cell identifier annotations"
+	print("\nloading cell identifier annotations")
 	with open(fileName) as ins:
 		# ignore first line of ____ ?
 		line_1 = ins.readline()
@@ -131,10 +131,10 @@ def loadCellIdentifierAnnotations(fileName, numCells):
 			return identifiers
 
 		else: #debug statement
-			print "Error loading annotations: num identifiers = {numIdentifiers}, num cells = {numCells}".format(numIdentifiers=len(identifiers), numCells=numCells)
+			print("Error loading annotations: num identifiers = {numIdentifiers}, num cells = {numCells}".format(numIdentifiers=len(identifiers), numCells=numCells))
 
 def loadMoleculeCountAnnotations(fileName, numCells):
-	print "\nloading molecule count annotations"
+	print("\nloading molecule count annotations")
 	with open(fileName) as ins:
 		# ignore first lines of ___ and group numbers
 		line_1 = ins.readline()
@@ -154,10 +154,10 @@ def loadMoleculeCountAnnotations(fileName, numCells):
 
 			return moleculeCounts
 		else: # debug statement
-			print "Error loading annotations: num molecule counts = {numMoleculeCounts}, num cells = {numCells}".format(numMoleculeCounts=len(moleculeCounts), numCells=numCells)
+			print("Error loading annotations: num molecule counts = {numMoleculeCounts}, num cells = {numCells}".format(numMoleculeCounts=len(moleculeCounts), numCells=numCells))
 
 def downSampleByClusterSize(rawData, cellIdentifierAnnotations):
-	print "\ndown sampling by cluster size"
+	print("\ndown sampling by cluster size")
 
 	# initialize counters for the 9 types
 	type1 = 0
@@ -217,22 +217,22 @@ def downSampleByClusterSize(rawData, cellIdentifierAnnotations):
 		idx += 1
 
 
-	print "type1 count = {type1Count}".format(type1Count=type1)
-	print "type2 count = {type2Count}".format(type2Count=type2)
-	print "type3 count = {type3Count}".format(type3Count=type3)
-	print "type4 count = {type4Count}".format(type4Count=type4)
-	print "type5 count = {type5Count}".format(type5Count=type5)
-	print "type6 count = {type6Count}".format(type6Count=type6)
-	print "type7 count = {type7Count}".format(type7Count=type7)
-	print "type8 count = {type8Count}".format(type8Count=type8)
-	print "type9 count = {type9Count}".format(type9Count=type9)
+	print("type1 count = {type1Count}".format(type1Count=type1))
+	print("type2 count = {type2Count}".format(type2Count=type2))
+	print("type3 count = {type3Count}".format(type3Count=type3))
+	print("type4 count = {type4Count}".format(type4Count=type4))
+	print("type5 count = {type5Count}".format(type5Count=type5))
+	print("type6 count = {type6Count}".format(type6Count=type6))
+	print("type7 count = {type7Count}".format(type7Count=type7))
+	print("type8 count = {type8Count}".format(type8Count=type8))
+	print("type9 count = {type9Count}".format(type9Count=type9))
 
 	# add all type counts to list to find smallest value
 	typeCounts = [type1, type2, type3, type4, type5, type6, type7, type8, type9]
 
 	minVal = min(typeCounts)
 
-	print "minumum cluster cell count = {minClusterCount}".format(minClusterCount=minVal)
+	print("minumum cluster cell count = {minClusterCount}".format(minClusterCount=minVal))
 
 	# take minVal number of random cells from each cluster
 	randType1Indices = random.sample(type1Indices, minVal)
@@ -284,17 +284,17 @@ def downSampleByClusterSize(rawData, cellIdentifierAnnotations):
 			downSampleClusterData.append(cell)
 		idx += 1 # move to next cell
 
-	print "{numCells} total cells randomly selected, genes = {numGenes}".format(numCells=len(downSampleClusterData), 
-		numGenes=len(downSampleClusterData[0]))
+	print("{numCells} total cells randomly selected, genes = {numGenes}".format(numCells=len(downSampleClusterData), 
+		numGenes=len(downSampleClusterData[0])))
 
 	return downSampleClusterData, randIndices
 
 def downSampleByMoleculeCount(downSampleClusterData, moleculeCountAnnotations, randIndices):
-	print "\ndown sampling by molecule count"
+	print("\ndown sampling by molecule count")
 
 	# make sure the number of random indices matches the number of cells in the down sample cluster data
 	if len(downSampleClusterData) != len(randIndices):
-		print "error: discrepancy between number of cells in db and indices list"
+		print("error: discrepancy between number of cells in db and indices list")
 		return;
 
 	# make a list of the molecule count annotations corresponding to the randomly selected cells
@@ -307,7 +307,7 @@ def downSampleByMoleculeCount(downSampleClusterData, moleculeCountAnnotations, r
 
 	# make sure that we have parallel annotations for all cells
 	if len(downSampleClusterData) != len(moleculeCountAnnsDS):
-		print "error: discrepancy between number of cells in db and molecule annotations"
+		print("error: discrepancy between number of cells in db and molecule annotations")
 		return;
 
 	# find the smallest value in the list i.e. the cell with the least number of molecules. other values for reference
@@ -315,8 +315,8 @@ def downSampleByMoleculeCount(downSampleClusterData, moleculeCountAnnotations, r
 	maxValue = max(moleculeCountAnnsDS)
 	avgValue = sum(moleculeCountAnnsDS)/len(moleculeCountAnnsDS)
 
-	print "down sampling all cells to minimum value = {minValue} molecules (max value = {maxValue}, avg value = {avgValue})".format(minValue=minValue,
-	 maxValue=maxValue, avgValue=avgValue)
+	print("down sampling all cells to minimum value = {minValue} molecules (max value = {maxValue}, avg value = {avgValue})".format(minValue=minValue,
+	 maxValue=maxValue, avgValue=avgValue))
 
 	# create data set down sampled by both cluster size and mnolecule count
 	dsCluster_MoleculeData = []
