@@ -1,0 +1,6 @@
+ Average global values:
+ - Accuracy: 0.943458980044346
+ - Sensitivity: 0.8421821952243135
+ - Specificity: 0.9425432089000856
+ - MCC: 0.627121466606575
+ - F1 Score: 0.6282004759165899
